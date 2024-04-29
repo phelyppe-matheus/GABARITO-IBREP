@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/webcam-easy@1.1.1/dist/webcam-easy.min.js"></script>
+    <style>
+        .exam-pic-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            
+            place-content: center;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: blueviolet;
+            color: lightgray;
+            border: none;
+        }
+
+        button:active {
+            background-color: darkblue;
+        }
+
+        button:hover {
+            background-color: dodgerblue;
+        }
+
+        .video-container {
+            display: grid;
+            place-content: center;
+            place-items: center;
+            position: relative;
+            aspect-ratio: 9/16;
+            height: 30rem;
+
+            overflow: hidden;
+        }
+
+        .video-container::after {
+            content: "";
+            
+            aspect-ratio: 0.25;
+            border: 15rem solid #00000088;
+            height: 90%;
+            z-index: 10;
+        }
+
+        video {
+            position: absolute;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        canvas {
+            position: fixed;
+            bottom: 110%;
+        }
+
+    </style>
+    <title>Document</title>
+</head>
+<body>
+    <div class="exam-pic-container">
+        <div class="video-container" data-aspect="0.25">
+            <video id="webCam" autoplay playsinline></video>
+        </div>
+        <div class="canva-container">
+            <canvas id="canvas"></canvas>
+        </div>
+        <div class="final-output">
+            <canvas id="canvas-to-send"></canvas>
+        </div>
+        <button onclick="snap(); return true;" download>SNAP</a>
+        <button onclick="retry();" download>Retry</a>
+    </div>
+    <script>
+        const webCamElement = document.getElementById("webCam");
+        const canvasElement = document.getElementById("canvas");
+        const canvasToSend = document.getElementById("canvas-to-send");
+        const webcam = new Webcam(webCamElement, "user", canvasElement);
+
+        webcam.start()
+            .catch((e) => {
+                console.log(e.constraint);
+            });
+        
+        function snap() {
+            const imgBuffer = webcam.snap();
+            const image = document.createElement("img");
+            image.src=imgBuffer;
+
+            image.onload = () => {
+                canvasToSend.height = canvasElement.height;
+                canvasToSend.width = canvasElement.height;
+                canvasToSend.getContext("2d").drawImage(image,
+                        canvasToSend.width / 2 - image.width / 2,
+                        canvasToSend.height / 2 - image.height / 2
+                );
+                canvasElement.style.position = "unset";
+                webCamElement.parentElement.style.position = "absolute";
+                webCamElement.parentElement.style.zIndex = "-1";
+            }
+        }
+
+        function retry() {
+            canvasToSend.getContext("2d").clearRect(0, 0, canvasToSend.width, canvasToSend.height);
+            canvasElement.style.position = "fixed";
+            webCamElement.parentElement.style.position = "relative";
+            webCamElement.parentElement.style.zIndex = "0";
+        }
+    </script>
+</body>
+</html>

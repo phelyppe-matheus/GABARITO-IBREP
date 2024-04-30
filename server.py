@@ -14,7 +14,7 @@ def exam_review():
     reviewer.reviewAnswers()
     return json.dumps({
         "score": reviewer.score,
-        "score": np.char.mod("%c", reviewer.studentsAnswers+65)
+        "answers": np.char.mod("%c", reviewer.studentsAnswers+65).tolist()
     })
 
 

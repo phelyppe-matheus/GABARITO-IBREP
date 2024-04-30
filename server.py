@@ -1,5 +1,7 @@
 from flask import Flask, request
 import json
+import numpy as np
+
 from ORMGabarito import AnswerSheetRecognitionModel
 
 app = Flask(__name__)
@@ -11,7 +13,8 @@ def exam_review():
     reviewer.recognise(base64=exam["examPhoto"])
     reviewer.reviewAnswers()
     return json.dumps({
-        "score": reviewer.score
+        "score": reviewer.score,
+        "score": np.char.mod("%c", reviewer.studentsAnswers+65)
     })
 
 

@@ -1,3 +1,4 @@
 *.jpg
 body.json
 test/
+__pycache__/**

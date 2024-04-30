@@ -14,4 +14,7 @@ def exam_review():
         "score": reviewer.score
     })
 
-app.run()
+
+
+if __name__ == '__main__':
+    app.run()

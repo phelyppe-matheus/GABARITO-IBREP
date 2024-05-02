@@ -183,7 +183,8 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    alert(data["answers"])
+                    alert("Resposta: "+data["answers"])
+                    alert("Erro: "+data["err"])
                 })
                 .catch(err => console.log(err))
         }

@@ -10,10 +10,9 @@ class AnswerSheetRecognitionModel:
     verticalPadding = 0.22
     horizontalPadding = 0.0
 
-    def __init__(self, correctAnswers, choiceCount):
+    def __init__(self, questionCount, choiceCount):
         self.contours = []
-        self.questionCount = len(correctAnswers)
-        self.correctAnswers = correctAnswers
+        self.questionCount = questionCount
         self.choiceCount = choiceCount
         self.imgWidth = self.choiceWidth * choiceCount
     
@@ -113,7 +112,7 @@ class AnswerSheetRecognitionModel:
             for j in range(self.choiceCount):
                 choice = self.getChoice(i, j)
 
-                kernelSize = self.kernelSize if self.kernelSize else 0.3*((self.bs-1)*0.5 - 1) + 0.8
+                kernelSize = self.kernelSize if hasattr(self, "kernelSize") else 0.3*((self.bs-1)*0.5 - 1) + 0.8
 
                 gs = cv2.getGaussianKernel(self.bs, kernelSize)
                 gs = (gs.T * gs)
@@ -123,10 +122,10 @@ class AnswerSheetRecognitionModel:
             else:
                 self.studentsAnswers[i] = -2
     
-    def reviewAnswers(self):
+    def reviewAnswers(self, correctAnswers):
         correct = 0
         for i in range(len(self.studentsAnswers)):
-            correct += self.correctAnswers[i] == chr(65+self.studentsAnswers[i])
+            correct += correctAnswers[i] == chr(65+self.studentsAnswers[i])
         self.score = correct/self.questionCount
 
 if __name__ == '__main__':
@@ -137,12 +136,12 @@ if __name__ == '__main__':
     ]
 
     img = open("test/10.jpg", "rb").read()
-    asmr = AnswerSheetRecognitionModel(correctAnswers, 5)
+    asmr = AnswerSheetRecognitionModel(15, 5)
     asmr.kernelSize = 1
     asmr.recognise(buffer=img)
     cv2.imshow("Choice", asmr.getChoice(0,0))
     cv2.imshow("IMG", cv2.resize(asmr.img, None, fx=0.1, fy=0.1))
-    asmr.reviewAnswers()
+    asmr.reviewAnswers(correctAnswers)
     print(asmr.score, np.array2string(asmr.studentsAnswers, formatter={"int":lambda x: chr(65+x)}))
     cv2.imshow("bk", cv2.resize(asmr.imgWarp, None, fx=0.4, fy=0.4))
     cv2.waitKey()

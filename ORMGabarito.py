@@ -113,7 +113,9 @@ class AnswerSheetRecognitionModel:
             for j in range(self.choiceCount):
                 choice = self.getChoice(i, j)
 
-                gs = cv2.getGaussianKernel(self.bs, 0.3*((self.bs-1)*0.5 - 1) + 0.8)
+                kernelSize = self.kernelSize if self.kernelSize else 0.3*((self.bs-1)*0.5 - 1) + 0.8
+
+                gs = cv2.getGaussianKernel(self.bs, kernelSize)
                 gs = (gs.T * gs)
                 self.answersProb[i,j] = 1-(choice*gs).sum()/255
             if self.answersProb[i].max() > 0.5:
@@ -134,11 +136,12 @@ if __name__ == '__main__':
         'D', 'C', 'E'
     ]
 
-    img = open("7.jpg", "rb").read()
+    img = open("test/10.jpg", "rb").read()
     asmr = AnswerSheetRecognitionModel(correctAnswers, 5)
+    asmr.kernelSize = 1
     asmr.recognise(buffer=img)
-    cv2.imshow("ahh", cv2.resize(asmr.img, None, fx=0.1, fy=0.1))
-    cv2.waitKey()
+    cv2.imshow("Choice", asmr.getChoice(0,0))
+    cv2.imshow("IMG", cv2.resize(asmr.img, None, fx=0.1, fy=0.1))
     asmr.reviewAnswers()
     print(asmr.score, np.array2string(asmr.studentsAnswers, formatter={"int":lambda x: chr(65+x)}))
     cv2.imshow("bk", cv2.resize(asmr.imgWarp, None, fx=0.4, fy=0.4))

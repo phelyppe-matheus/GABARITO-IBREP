@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/webcam-easy@1.1.1/dist/webcam-easy.min.js"></script>
+    <link rel="icon" type="image/svg" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -13,20 +15,26 @@
         }
         .exam-pic-container {
             display: grid;
-            grid-template-columns: 1fr;
-            grid-template-rows: 1fr auto auto;
-            grid-template-rows: 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-rows: 1fr auto 1rem;
             place-content: center;
             place-items: center;
             height: 100vh;
             height: 100dvh;
         }
         button {
-            padding: 5px 10px;
+            z-index: 2;
+            grid-row: 2/3;
+
             background-color: blueviolet;
             color: lightgray;
+            bottom: 10px;
+
+            height: 3rem;
+            aspect-ratio: 1;
             border: none;
-            width: 100%;
+            border-radius: 100%;
+
             text-transform: uppercase;
         }
         button p {
@@ -36,14 +44,23 @@
 
         button#snap {
             background-color: hsl(0, 51%, 29%);
+            grid-column: 3;
         }
 
         button#send {
             background-color: hsl(120, 51%, 29%);
+            right: 10px;
+            grid-column: 4;
         }
 
         button#retry {
             background-color: hsl(53, 51%, 29%);
+            left: 10px;
+            grid-column: 1;
+        }
+
+        button#flip {
+            grid-column: 2;
         }
 
         button:active {
@@ -62,7 +79,10 @@
             aspect-ratio: 9/16;
 
             overflow: hidden;
-            height: calc(100vh - 4em);
+            height: 100vh;
+            height: 100dvh;
+            grid-row: 1/-1;
+            grid-column: 1/5;
         }
 
         .video-container::after {
@@ -71,7 +91,7 @@
             aspect-ratio: 0.25;
             border: 15rem solid #00000088;
             height: 100%;
-            z-index: 10;
+            z-index: 1;
         }
 
         video {
@@ -99,33 +119,23 @@
         <div class="final-output">
             <canvas id="canvas-to-send"></canvas>
         </div>
-        <button id="snap" onclick="snap(); return true;" download><p>SNAP</p></button>
-        <button id="send" onclick="send(); return true;" download><p>SEND</p></button>
-        <button id="retry" onclick="retry();" download><p>Retry</p></button>
+        <button id="snap" onclick="snap(); return true;" download><i class="fa fa-camera"></i></button>
+        <button id="send" onclick="send(); return true;" download><i class="fa fa-paper-plane"></i></button>
+        <button id="retry" onclick="retry();" download><i class="fa fa-rotate-right"></i></button>
+        <button id="flip" onclick="webcam.flip();return true;">Gira</button>
     </div>
     <script>
         const webCamElement = document.getElementById("webCam");
         const canvasElement = document.getElementById("canvas");
         const canvasToSend = document.getElementById("canvas-to-send");
-        const choicesCount = window.prompt("Quantas opções por questão?")
-        const questonCount = window.prompt("Quantas questões?")
+        // const choicesCount = window.prompt("Quantas opções por questão?")
+        // const questonCount = window.prompt("Quantas questões?")
         const webcam = new Webcam(webCamElement, "user", canvasElement);
 
         var imgBuffer;
 
         webcam.flip();
 
-        function show(el) {
-            if (el.dataset.lastDisplay) el.style.display = el.dataset.lastDisplay;
-            else el.style.display = 'block';
-        }
-
-        function hide(el) {
-            el.dataset.lastDisplay = el.style.display;
-            el.style.display = "none";
-        }
-
-        hide(document.getElementById("send"))
 
         webcam.start()
             .catch((e) => {
@@ -133,19 +143,14 @@
             });
 
         function snap() {
-            show(document.getElementById("send"))
-            hide(document.getElementById("snap"))
             imgBuffer = webcam.snap();
             const image = document.createElement("img");
             image.src=imgBuffer;
 
             image.onload = () => {
-                canvasToSend.height = canvasElement.height;
-                canvasToSend.width = canvasElement.height;
-                canvasToSend.getContext("2d").drawImage(image,
-                        canvasToSend.width / 2 - image.width / 2,
-                        canvasToSend.height / 2 - image.height / 2
-                );
+                canvasToSend.height = image.height;
+                canvasToSend.width = image.width;
+                canvasToSend.getContext("2d").drawImage(image, 0, 0);
                 canvasElement.style.position = "unset";
                 webCamElement.parentElement.style.position = "absolute";
                 webCamElement.parentElement.style.zIndex = "-1";
@@ -153,8 +158,6 @@
         }
 
         function retry() {
-            show(document.getElementById("snap"))
-            hide(document.getElementById("send"))
             canvasToSend.getContext("2d").clearRect(0, 0, canvasToSend.width, canvasToSend.height);
             canvasElement.style.position = "fixed";
             webCamElement.parentElement.style.position = "relative";

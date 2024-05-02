@@ -10,6 +10,27 @@
         * {
             box-sizing: border-box;
         }
+
+        /* HTML: <div class="loader"></div> */
+        body.loading::after {
+            content: "";
+            display: block;
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+
+            background-color: hsl(120, 51%, 29%);
+            inset: 0;
+
+            animation: loading 1500ms ease-in-out 0s infinite;
+        }
+
+        @keyframes loading {
+            0% {filter: opacity(0);}
+            50% {filter: opacity(0.3);}
+            100% {filter: opacity(0);}
+        }
+
         body {
             margin: 0;
         }
@@ -129,7 +150,7 @@
         const canvasElement = document.getElementById("canvas");
         const canvasToSend = document.getElementById("canvas-to-send");
         const choicesCount = window.prompt("Quantas opções por questão?")
-        const questonCount = window.prompt("Quantas questões?")
+        const questionCount = window.prompt("Quantas questões?")
         const webcam = new Webcam(webCamElement, "user", canvasElement);
 
         var imgBuffer;
@@ -166,9 +187,11 @@
             const url = "https://gabarito-ibrep.onrender.com/api/exam/review"
             body = {
                 "choicesCount": choicesCount,
-                "questionCount": questonLength,
+                "questionCount": questionCount,
                 "examPhoto": imgBuffer
             }
+
+            document.body.classList.add("loading")
 
             fetch(url, {
                 method: 'POST',
@@ -184,6 +207,9 @@
                     alert("Erro: "+data["err"])
                 })
                 .catch(err => console.log(err))
+                .finally(() => {
+                    document.body.classList.remove("loading")
+                })
         }
     </script>
 </body>

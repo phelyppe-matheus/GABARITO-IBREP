@@ -129,16 +129,18 @@ class AnswerSheetRecognitionModel:
         self.score = correct/self.questionCount
 
 if __name__ == '__main__':
+    import json
     correctAnswers = [
         'A', 'C', 'B', 'E', 'A', 'C',
         'D', 'D', 'C', 'D', 'A', 'E',
         'D', 'C', 'E'
     ]
 
-    img = open("test/10.jpg", "rb").read()
+    img = json.loads(open("test/body1.json", "r").read())["examPhoto"]
     asmr = AnswerSheetRecognitionModel(15, 5)
     asmr.kernelSize = 1
-    asmr.recognise(buffer=img)
+    asmr.recognise(base64=img)
+    asmr.imgBlack = cv2.threshold(asmr.imgWarp, 130, 255, cv2.THRESH_OTSU)
     cv2.imshow("Choice", asmr.getChoice(0,0))
     cv2.imshow("IMG", cv2.resize(asmr.img, None, fx=0.1, fy=0.1))
     asmr.reviewAnswers(correctAnswers)

@@ -128,8 +128,8 @@
         const webCamElement = document.getElementById("webCam");
         const canvasElement = document.getElementById("canvas");
         const canvasToSend = document.getElementById("canvas-to-send");
-        // const choicesCount = window.prompt("Quantas opções por questão?")
-        // const questonCount = window.prompt("Quantas questões?")
+        const choicesCount = window.prompt("Quantas opções por questão?")
+        const questonCount = window.prompt("Quantas questões?")
         const webcam = new Webcam(webCamElement, "user", canvasElement);
 
         var imgBuffer;

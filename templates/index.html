@@ -106,18 +106,19 @@
             grid-column: 1/5;
         }
 
-        .video-container::after {
-            content: "";
-            
+        .video-container-overlay {
+            position: relative;
             aspect-ratio: 0.25;
             border: 15rem solid #00000088;
-            height: 100%;
+            box-sizing: content-box;
+            height: clamp(10px, 100%, 95vh);
             z-index: 1;
         }
 
         video {
             position: absolute;
             height: 100%;
+            width: 100%;
             object-fit: cover;
         }
 
@@ -133,6 +134,7 @@
     <div class="exam-pic-container">
         <div class="video-container" data-aspect="0.25">
             <video id="webCam" autoplay playsinline></video>
+            <div class="video-container-overlay"></div>
         </div>
         <div class="canva-container">
             <canvas id="canvas"></canvas>
@@ -159,6 +161,10 @@
             .catch((e) => {
                 console.log(e.constraint);
             });
+        
+        document.querySelectorAll('.video-container-overlay').forEach((e, _, __) => {
+            e.style.aspectRatio = choicesCount/questionCount;
+        });
 
         function snap() {
             imgBuffer = webcam.snap();

@@ -5,12 +5,12 @@ import utils
 
 ########################################################################
 webCamFeed = False
-pathImage = "8.jpg"
+pathImage = "test/test_07.jpg"
 cap = cv2.VideoCapture(0)
 cap.set(10,160)
 heightImg = 700
 widthImg  = 700
-questions=5
+questions=19
 choices=5
 ans= [1,2,0,2,4]
 ########################################################################

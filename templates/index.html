@@ -108,10 +108,7 @@
 
         .video-container-overlay {
             position: relative;
-            aspect-ratio: 0.25;
-            border: 15rem solid #00000088;
-            box-sizing: content-box;
-            height: clamp(10px, 100%, 95vh);
+            box-shadow: 0 0 0px calc(100vh + 100vw) #00000088;
             z-index: 1;
         }
 
@@ -163,7 +160,31 @@
             });
         
         document.querySelectorAll('.video-container-overlay').forEach((e, _, __) => {
-            e.style.aspectRatio = choicesCount/questionCount;
+            if (e.parentElement) {
+                setTimeout(() => {
+                    parentHeight = e.parentElement.getBoundingClientRect().height * 0.95
+                    parentWidth = e.parentElement.getBoundingClientRect().width * 0.95
+
+                    heightBasedH = parentHeight
+                    heightBasedW = parentHeight / (questionCount/choicesCount)
+                    widthBasedH = parentWidth / (choicesCount/questionCount)
+                    widthBasedW = parentWidth
+
+                    if (heightBasedW > parentWidth) {
+                        e.style.width = `${widthBasedW}px`;
+                        e.style.height = `${widthBasedH}px`;
+                    } else if (widthBasedH > parentHeight) {
+                        e.style.width = `${heightBasedW}px`;
+                        e.style.height = `${heightBasedH}px`;
+                    } else {
+                        e.style.width = `${Math.max(heightBasedW, widthBasedW)}px`;
+                        e.style.height = `${Math.max(heightBasedH, widthBasedH)}px`;
+                    }
+                    console.log(choicesCount,questionCount,minSize, (choicesCount/questionCount)*minSize, (questionCount/choicesCount)*minSize,e.style.height,e.style.width);
+                }, 500);
+            } else {
+                e.remove()
+            }
         });
 
         function snap() {

@@ -15,7 +15,13 @@ def exam_review():
         questionCount = int(exam["questionCount"])
         choiceCount = int(exam["choicesCount"])
         reviewer = AnswerSheetRecognitionModel(questionCount, choiceCount)
-        reviewer.recognise(base64=exam["examPhoto"])
+        match exam["examPhotoType"]:
+            case 0:
+                reviewer.recognise(base64=exam["examPhoto"])
+            case 1:
+                reviewer.recognise(buffer=exam["examPhoto"])
+            case _:
+                res['err'] = 'please provide the examPhoto Type'
         if hasattr(reviewer, "studentsAnswers"):
             reviewer.kernelSize = 1
             res["answers"] = np.char.mod("%c", reviewer.studentsAnswers+65).tolist()
@@ -27,6 +33,7 @@ def exam_review():
     except TypeError:
         res['err'] = "Cheque sua tipagem."
     return jsonify(res)
+
 
 @app.route("/exam/review/test", methods=["GET"])
 def test_exam_review():

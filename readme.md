@@ -25,4 +25,14 @@ _JSON_
 |---|---|
 |0|Use esse tipo caso examPhoto esteja em base64|
 |1|Use esse tipo caso examPhoto esteja em bits|
-|2|Use esse tipo caso examPhoto seja um link|
+|2|Use esse tipo caso examPhoto seja um link (Não suportado ainda)|
+
+## Erros
+### Tipos de erros
+|Categoria|Descrição|
+|---|---|
+|noSuchPhotoType|Tipo inválido de imagem|
+|noSheet|Não foi possível encontrar o gabarito na imagem|
+|tipo|Tipo errado nos campos json|
+|duplicate|Mais de uma alternativa marcada|
+|unknown|Erro ainda não documentado|

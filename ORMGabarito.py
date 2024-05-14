@@ -5,6 +5,7 @@ import math
 
 class ORMParameters:
     minArea = 1500
+    lowThreshold = 0.5
     hitThreshold = 0.7
 
 class AnswerSheetRecognitionModel:
@@ -25,9 +26,12 @@ class AnswerSheetRecognitionModel:
         return img
 
     def recognise(self, path = None, base64=None, buffer=None):
+        self.studentsAnswers = np.int8(np.zeros((self.questionCount))-2)
+        self.err = {}
+
         self.loadimg(path, base64, buffer)
-        self.preProcessing()
-        self.findRectContour()
+        _, __, ___, imgCanny = self.preProcessing(self.img)
+        self.findRectContour(imgCanny)
 
         if len(self.contours):
             reconAnswers = self.contours[0]
@@ -47,21 +51,24 @@ class AnswerSheetRecognitionModel:
             nparr = np.frombuffer(buffer, np.uint8)
             self.img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    def preProcessing(self):
-        self.studentsAnswers = np.int8(np.zeros((self.questionCount))-2)
+    def preProcessing(self, img, imgShape=(0,0)):
+        if imgShape == (0,0):
+            imgShape = (self.imgWidth, self.imgWidth)
+        imgResized = cv2.resize(img, (imgShape[0], imgShape[1]))
+        if imgResized.shape[-1] == 3: imgGray = cv2.cvtColor(imgResized, cv2.COLOR_BGR2GRAY)
+        else: imgGray = imgResized
+        if self.choiceCount >= self.questionCount :imgBlur = cv2.GaussianBlur(imgGray, (5,5), 1)
+        else: imgBlur = cv2.GaussianBlur(imgGray, (3,3), 1)
+        imgCanny = cv2.Canny(imgBlur,10,50)
 
-        self.imgResized = cv2.resize(self.img, (self.imgWidth, self.imgWidth))
-        self.imgGray = cv2.cvtColor(self.imgResized, cv2.COLOR_BGR2GRAY)
-        if self.choiceCount >= self.questionCount :self.imgBlur = cv2.GaussianBlur(self.imgGray, (5,5), 1)
-        else: self.imgBlur = cv2.GaussianBlur(self.imgGray, (3,3), 1)
-        self.imgCanny = cv2.Canny(self.imgBlur,10,50)
+        return imgResized, imgGray, imgBlur, imgCanny
 
-    def findContour(self):
-        contours, _ = cv2.findContours(self.imgCanny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    def findContour(self, imgCanny):
+        contours, _ = cv2.findContours(imgCanny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         return contours
 
-    def findRectContour(self):
-        contours = self.findContour()
+    def findRectContour(self, imgCanny):
+        contours = self.findContour(imgCanny)
         for contour in contours:
             area = cv2.contourArea(contour)
             if area > ORMParameters.minArea:
@@ -90,9 +97,12 @@ class AnswerSheetRecognitionModel:
 
         return newPoints
 
+    def scalePoints(self, points, fx, fy):
+        return points*[fx,fy]
+
     def warpRect(self, answers):
         answers = self.reorder(answers)
-        answersSized = answers*[self.img.shape[1]/self.imgWidth,self.img.shape[0]/self.imgWidth]
+        answersSized = self.scalePoints(answers,self.img.shape[1]/self.imgWidth,self.img.shape[0]/self.imgWidth)
         imgGraySized = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         self.imgHeight = int(self.imgWidth*(self.questionCount / self.choiceCount))
 
@@ -111,21 +121,37 @@ class AnswerSheetRecognitionModel:
     
     def getAnswers(self):
         self.answersProb = np.zeros((self.questionCount, self.choiceCount))
+        # _, __, ___, imgCanny = self.preProcessing(self.imgWarp)
+        # contours = self.findContour(imgCanny)
+        # for i in range(len(contours)):
+        #     contour = self.scalePoints(contours[i],700/self.imgWidth,700*19/self.imgWidth)
+        #     poly = cv2.fillPoly(self.imgWarp, contour, (0, 255, 0))
+
+        kernelSize = self.kernelSize if hasattr(self, "kernelSize") else 0.3*((self.bs-1)*0.5 - 1) + 0.8
+
+        gaussian2D = np.zeros((self.choiceWidth, self.choiceWidth))
+        gaussian2D[self.choiceWidth//2, self.choiceWidth//2] = 1
+        gaussian2D = cv2.GaussianBlur(gaussian2D, ((self.choiceWidth//2)*2-3, (self.choiceWidth//2)*2-3), 0)
+        answerKernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(kernelSize), int(kernelSize)))
+        answerKernel = np.pad(answerKernel,(math.floor((self.choiceWidth-kernelSize)/2), math.ceil((self.choiceWidth-kernelSize)/2)))
+        clearSpace = (-answerKernel+1)*gaussian2D
+        answerKernel = answerKernel / answerKernel.sum()
+        clearSpace = clearSpace / clearSpace.sum()
+
         for i in range(self.questionCount):
             for j in range(self.choiceCount):
                 choice = self.getChoice(i, j)
 
-                kernelSize = self.kernelSize if hasattr(self, "kernelSize") else 0.3*((self.bs-1)*0.5 - 1) + 0.8
-
-                gs = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(kernelSize), int(kernelSize)))
-                gs = np.pad(gs,(math.floor((self.choiceWidth-kernelSize)/2), math.ceil((self.choiceWidth-kernelSize)/2)))
-                gs = gs/gs.sum()
-                self.answersProb[i,j] = 1-(choice*gs).sum()/255
-            if self.answersProb[i].max() > ORMParameters.hitThreshold:
+                self.answersProb[i,j] = 1-(choice*answerKernel).sum()/255
+            if (self.answersProb[i] > ORMParameters.hitThreshold).sum() > 1:
+                if 'duplicate' not in self.err: self.err['duplicate'] = []
+                self.err['duplicate'].append(i)
+                self.studentsAnswers[i] = self.answersProb[i].argmax()
+            elif self.answersProb[i].max() > ORMParameters.hitThreshold:
                 self.studentsAnswers[i] = self.answersProb[i].argmax()
             else:
                 self.studentsAnswers[i] = -2
-    
+
     def reviewAnswers(self, correctAnswers):
         correct = 0
         for i in range(len(self.studentsAnswers)):
@@ -144,25 +170,26 @@ if __name__ == '__main__':
         "test_08": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
         "test_09": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
         "test_10": ['c','?','c','?','c','d','?','b','d','b','c','d','c','?','e','c','b','a','c'],
-        "test_11": ['a','?','?','?','c','?','d','c','e','c','d','e','?','?','?','?','?','?','?'],
+        "test_11": ['e','?','?','?','c','?','d','c','e','c','d','e','?','?','?','?','?','?','?'],
         "test_12": ['c','?','c','?','c','d','?','b','d','b','c','d','c','?','e','c','b','a','c'],
         "test_13": ["e","d","c","b","c","b","c","d","c","d","d","c","b","d","c","b","c","d","e"],
     }
 
-    showTest = 'test_13'
+    showTest = 'test_11'
     showAllTest = True
-    asw = 15
+    asw = 7
 
     for test in tests:
         # try:
             if showAllTest or showTest == test:
-                reviewer = AnswerSheetRecognitionModel(19, 5)
+                reviewer = AnswerSheetRecognitionModel(10, 5)
                 reviewer.kernelSize = 30
                 reviewer.recognise(f"test/{test}.jpg")
                 print(
                     f"test/{test}.jpg",
                     np.char.mod("%c", reviewer.studentsAnswers+65).tolist(),
                     tests[test],
+                    reviewer.err,
                     sep='\n', end='\n'+"="*5*19+'\n')
             if showTest == test:
                 # for c in reviewer.findContour():

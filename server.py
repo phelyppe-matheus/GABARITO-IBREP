@@ -9,7 +9,7 @@ app = Flask(__name__, template_folder="templates")
 @app.route("/api/exam/review", methods=["POST"])
 @cross_origin(origins="*")
 def exam_review():
-    res = dict()
+    res = {"err": {}}
     try:
         exam = request.json
         questionCount = int(exam["questionCount"])
@@ -21,17 +21,23 @@ def exam_review():
             case 1:
                 reviewer.recognise(buffer=exam["examPhoto"])
             case _:
-                res['err'] = 'please provide the examPhoto Type'
+                res['err']['noSuchPhotoType'] = 'please provide a examPhoto Type'
         if hasattr(reviewer, "studentsAnswers"):
             reviewer.kernelSize = 1
             res["answers"] = np.char.mod("%c", reviewer.studentsAnswers+65).tolist()
         else:
-            res['err'] = "Não pude reconhecer as questões"
+            res['err']['noSheet'] = "Não pude reconhecer as questões"
         if "correctAnswers" in exam:
             reviewer.reviewAnswers(exam["correctAnswers"])
             res["score"] = reviewer.score
+        if  hasattr(reviewer, 'err'):
+            res['err'].update(reviewer.err)
     except TypeError:
-        res['err'] = "Cheque sua tipagem."
+        res['err']["tipo"] = "Cheque sua tipagem."
+    except ValueError as e:
+        res['err']["wrongValue"] = str(e)
+    except Exception as e:
+        res['err']["unknown"] =str(e)
     return jsonify(res)
 
 

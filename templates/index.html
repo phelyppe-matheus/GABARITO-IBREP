@@ -215,6 +215,7 @@
             body = {
                 "choicesCount": choicesCount,
                 "questionCount": questionCount,
+                "examPhotoType": 0,
                 "examPhoto": imgBuffer
             }
 
@@ -231,7 +232,7 @@
                 .then(res => res.json())
                 .then(data => {
                     alert("Resposta: "+data["answers"])
-                    alert("Erro: "+data["err"])
+                    alert("Erro: "+JSON.stringify(data["err"]))
                 })
                 .catch(err => console.log(err))
                 .finally(() => {

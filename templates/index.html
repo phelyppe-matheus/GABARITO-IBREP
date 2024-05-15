@@ -148,8 +148,21 @@
         const webCamElement = document.getElementById("webCam");
         const canvasElement = document.getElementById("canvas");
         const canvasToSend = document.getElementById("canvas-to-send");
-        const choicesCount = window.prompt("Quantas opções por questão?")
-        const questionCount = window.prompt("Quantas questões?")
+        var choicesCount = window.prompt("Quantas opções por questão?")
+        var questionCount = window.prompt("Quantas questões?")
+        var rightAnswers = '';
+
+        while (true) {
+            rightAnswers = window.prompt("Deseja aplicar a correção? Se sim, digite as respostas no seguinte formato:\n\t[A,A,D,E,C]");
+            if (rightAnswers == '') break
+            if (rightAnswers.split(",").length === Number(questionCount)) {
+                rightAnswers = rightAnswers.replaceAll(' ','').toUpperCase().split(",")
+                if (confirm(`Suas respostas são\n\n${rightAnswers.map((n) => n.charCodeAt(0) > 63 ? '    |  '.repeat(n.charCodeAt(0)-64)+"x"+'  |    '.repeat(64-n.charCodeAt(0)+6):'    |  '.repeat(6)).join('\n')}.\nCorreto?`)) break
+            } else {
+                alert("Respostas Insuficientes")
+            }
+        }
+
         const webcam = new Webcam(webCamElement, "user", canvasElement);
 
         var imgBuffer;
@@ -180,7 +193,6 @@
                         e.style.width = `${Math.max(heightBasedW, widthBasedW)}px`;
                         e.style.height = `${Math.max(heightBasedH, widthBasedH)}px`;
                     }
-                    console.log(choicesCount,questionCount,minSize, (choicesCount/questionCount)*minSize, (questionCount/choicesCount)*minSize,e.style.height,e.style.width);
                 }, 500);
             } else {
                 e.remove()
@@ -188,6 +200,7 @@
         });
 
         function snap() {
+
             imgBuffer = webcam.snap();
             const image = document.createElement("img");
             image.src=imgBuffer;

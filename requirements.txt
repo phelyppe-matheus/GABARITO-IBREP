@@ -1,16 +1,59 @@
+certifi==2024.2.2
 cffi==1.16.0
-click # @ file:///C:/b/abs_f9ihnt72pu/croot/click_1698129847492/work
-colorama # @ file:///C:/ci_311/colorama_1676422310965/work
+charset-normalizer==3.3.2
+click @ file:///C:/b/abs_f9ihnt72pu/croot/click_1698129847492/work
+colorama @ file:///C:/ci_311/colorama_1676422310965/work
+contourpy==1.2.1
 cryptography==42.0.7
-Flask # @ file:///C:/b/abs_efc024w7fv/croot/flask_1702980041157/work
+cycler==0.12.1
+filelock==3.14.0
+Flask @ file:///C:/b/abs_efc024w7fv/croot/flask_1702980041157/work
 Flask-Cors==4.0.0
+fonttools==4.51.0
+fsspec==2024.5.0
 gunicorn==22.0.0
+idna==3.7
 imutils==0.5.4
-itsdangerous # @ file:///tmp/build/80754af9/itsdangerous_1621432558163/work
-Jinja2 # @ file:///C:/b/abs_f7x5a8op2h/croot/jinja2_1706733672594/work
-MarkupSafe # @ file:///C:/b/abs_ecfdqh67b_/croot/markupsafe_1704206030535/work
+intel-openmp==2021.4.0
+itsdangerous @ file:///tmp/build/80754af9/itsdangerous_1621432558163/work
+Jinja2 @ file:///C:/b/abs_f7x5a8op2h/croot/jinja2_1706733672594/work
+kiwisolver==1.4.5
+MarkupSafe @ file:///C:/b/abs_ecfdqh67b_/croot/markupsafe_1704206030535/work
+matplotlib==3.9.0
+mkl==2021.4.0
+mpmath==1.3.0
+networkx==3.3
 numpy==1.26.4
 opencv-python==4.9.0.80
 packaging==24.0
+pandas==2.2.2
+pillow==10.3.0
+psutil==5.9.8
+py-cpuinfo==9.0.0
 pycparser==2.22
-Werkzeug # @ file:///C:/b/abs_3901hwqcw0/croot/werkzeug_1706210134718/work
+pyparsing==3.1.2
+pypng==0.20220715.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
+pytz==2024.1
+PyYAML==6.0.1
+pyzbar==0.1.9
+qrdet==2.4
+qreader==3.12
+quadrilateral-fitter==1.8
+requests==2.32.1
+scipy==1.13.0
+seaborn==0.13.2
+shapely==2.0.4
+six==1.16.0
+sympy==1.12
+tbb==2021.12.0
+thop==0.1.1.post2209072238
+torch==2.3.0
+torchvision==0.18.0
+tqdm==4.66.4
+typing_extensions==4.11.0
+tzdata==2024.1
+ultralytics==8.2.18
+urllib3==2.2.1
+Werkzeug @ file:///C:/b/abs_3901hwqcw0/croot/werkzeug_1706210134718/work

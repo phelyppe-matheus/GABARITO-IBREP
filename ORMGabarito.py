@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import base64
 import math
+from qreader import QReader
+
+qreader = QReader()
 
 class ORMParameters:
     minArea = 1500
@@ -13,23 +16,28 @@ class AnswerSheetRecognitionModel:
     verticalPadding = 0.22
     horizontalPadding = 0.0
 
-    def __init__(self, questionCount, choiceCount):
+    def __init__(self):
         self.contours = []
-        self.questionCount = questionCount
-        self.choiceCount = choiceCount
-        self.imgWidth = self.choiceWidth * choiceCount
-    
+
     def readb64(self, uri):
         encoded_data = uri.split(',')[1]
         nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         return img
+    
+    def getQrCodeData(self):
+        return qreader.detect_and_decode(self.img)
 
-    def recognise(self, path = None, base64=None, buffer=None):
+    def setUp(self, questionCount, choiceCount, path = None, base64=None, buffer=None):
+        self.questionCount = questionCount
+        self.choiceCount = choiceCount
+        self.imgWidth = self.choiceWidth * choiceCount
+        self.loadimg(path, base64, buffer)
+
+    def recognise(self):
         self.studentsAnswers = np.int8(np.zeros((self.questionCount))-2)
         self.err = {}
 
-        self.loadimg(path, base64, buffer)
         _, __, ___, imgCanny = self.preProcessing(self.img)
         self.findRectContour(imgCanny)
 
@@ -158,7 +166,9 @@ class AnswerSheetRecognitionModel:
             correct += correctAnswers[i] == chr(65+self.studentsAnswers[i])
         self.score = correct/self.questionCount
 
+
 if __name__ == '__main__':
+
     tests = {
         "test_01": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
         "test_02": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
@@ -173,42 +183,9 @@ if __name__ == '__main__':
         "test_11": ['e','?','?','?','c','?','d','c','e','c','d','e','?','?','?','?','?','?','?'],
         "test_12": ['c','?','c','?','c','d','?','b','d','b','c','d','c','?','e','c','b','a','c'],
         "test_13": ["e","d","c","b","c","b","c","d","c","d","d","c","b","d","c","b","c","d","e"],
+        "test_14": ["e","d","c","b","c","b","c","d","c","d","d","c","b","d","c","b","c","d","e"],
+        "test_15": ["e","d","c","b","c","b","c","d","c","d","d","c","b","d","c","b","c","d","e"],
+        "test_16": ['d','c','d','c','d','c','b','d','e','c','b','a','?','d','e','c','b','a','d'],
+        "test_17": [],
     }
 
-    showTest = 'test_11'
-    showAllTest = True
-    asw = 7
-
-    for test in tests:
-        # try:
-            if showAllTest or showTest == test:
-                reviewer = AnswerSheetRecognitionModel(10, 5)
-                reviewer.kernelSize = 30
-                reviewer.recognise(f"test/{test}.jpg")
-                print(
-                    f"test/{test}.jpg",
-                    np.char.mod("%c", reviewer.studentsAnswers+65).tolist(),
-                    tests[test],
-                    reviewer.err,
-                    sep='\n', end='\n'+"="*5*19+'\n')
-            if showTest == test:
-                # for c in reviewer.findContour():
-                #     print(cv2.contourArea(c), len(reviewer.findCornerPoints(c)))
-                #     cv2.imshow(f"Gray Image: test/{test}.jpg", cv2.drawContours(reviewer.imgResized, c[1::], -1, (0,255,0), 1))
-                #     cv2.waitKey(0)
-                if hasattr(reviewer, 'imgWarp'):
-                    cv2.imshow(f'img {test}', cv2.resize(reviewer.imgWarp, (0,0), fx=0.25, fy=0.25))
-                    cv2.imshow(f'choice {asw}, {reviewer.studentsAnswers[asw]}', reviewer.getChoice(asw, reviewer.studentsAnswers[asw]))
-                else: print("Não tem warp")
-                if hasattr(reviewer, 'answersProb'): print(reviewer.answersProb)
-                else: print('Não há probabilidade de respostas')
-                if len(reviewer.contours):
-                    i = reviewer.contours[0]
-                    peri = cv2.arcLength(i, True)
-                    approx = reviewer.reorder(cv2.approxPolyDP(i, 0.002*peri, True))
-                    print(cv2.contourArea(i))
-        # except Exception as e:
-        #     print(test, e)
-        #     cv2.imshow(f"Error Gray Image: test/{test}.jpg", reviewer.imgGray)
-        
-    cv2.waitKey(0)

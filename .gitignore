@@ -2,3 +2,4 @@
 body.json
 test/
 __pycache__/**
+.env

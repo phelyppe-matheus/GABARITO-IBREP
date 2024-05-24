@@ -260,7 +260,7 @@
 
             if (!choices, !questions) return
             chosen = Array.from(document.querySelectorAll(".row > input[type='radio']:checked")).map(el => Number(el.value))
-            if (chosen.length < questions) return
+            if (chosen.length < q) return
             body = {
                 "msg": chosen.join("")
             }

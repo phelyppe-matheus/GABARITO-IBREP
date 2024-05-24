@@ -138,6 +138,15 @@
             position: fixed;
             bottom: 110%;
         }
+        
+
+        .ibrep-icon {
+            clip-path: path("M17.5 1.5C11.9835 1.5 7.5 6.03497 7.5 11.6435C7.5 13.6772 8.08956 15.5696 9.10431 17.1563C11.1205 14.746 14.1327 13.213 17.5 13.213C20.8673 13.213 23.8795 14.746 25.8957 17.1563C26.9104 15.5696 27.5 13.6772 27.5 11.6435C27.5 6.03497 23.0165 1.5 17.5 1.5ZM26.536 18C27.7743 16.1967 28.5 14.005 28.5 11.6435C28.5 5.49552 23.5815 0.5 17.5 0.5C11.4185 0.5 6.5 5.49552 6.5 11.6435C6.5 14.005 7.22568 16.1967 8.46401 18C7.22568 19.8033 6.5 21.995 6.5 24.3565C6.5 30.5045 11.4185 35.5 17.5 35.5C23.5815 35.5 28.5 30.5045 28.5 24.3565C28.5 21.995 27.7743 19.8033 26.536 18ZM25.2934 18C23.4587 15.6886 20.6484 14.213 17.5 14.213C14.3516 14.213 11.5413 15.6886 9.70662 18C11.5413 20.3114 14.3516 21.787 17.5 21.787C20.6484 21.787 23.4587 20.3114 25.2934 18ZM9.10431 18.8437C11.1205 21.254 14.1327 22.787 17.5 22.787C20.8673 22.787 23.8795 21.254 25.8957 18.8437C26.9104 20.4304 27.5 22.3228 27.5 24.3565C27.5 29.965 23.0165 34.5 17.5 34.5C11.9835 34.5 7.5 29.965 7.5 24.3565C7.5 22.3228 8.08956 20.4304 9.10431 18.8437Z");
+            height: 36px;
+            aspect-ratio: 1;
+            background-color: white;
+            scale: .8;
+        }
 
     </style>
     <title>Document Scanner</title>
@@ -157,7 +166,7 @@
         <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
         <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
         <button id="flip" onclick="webcam.flip();webcam.start();return true;" class="cam-opt"><i class="fa fa-rotate-right"></i></button>
-        <button id="menu" onclick="" class="cam-opt"><i class="fa fa-cog"></i></button>
+        <button id="menu" onclick="sendToApi()" class="cam-opt"><div class="ibrep-icon"></div></button>
     </div>
     <script>
         const webCamElement = document.getElementById("webCam");

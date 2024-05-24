@@ -33,7 +33,7 @@
 
             display: grid;
             grid-template-columns: 1fr 5rem;
-            grid-template-rows: repeat(7, min-content);
+            grid-template-rows: repeat(4, min-content);
             align-items: end;
             gap: 1rem;
 
@@ -163,19 +163,18 @@
 
             padding: 1rem;
         }
+
     </style>
 </head>
 <body>
     <div id="dashboard" class="dashboard">
         <h1>Menu ibrep</h1>
-        <label for="iddisciplina">Disciplina (ID)</label>
-        <input type="number" id="iddisciplina" name="iddisciplina" placeholder="148827">
-        <label for="idtipo">Tipo de nota (ID)</label>
-        <input type="number" id="idtipo" name="idtipo" placeholder="6">
-        <label for="idmodelo">Modelo de prova (ID)</label>
-        <input type="number" id="idmodelo" name="idmodelo" placeholder="1">
-        <label for="protocolo">Modelo de prova (ID)</label>
-        <input type="number" id="protocolo" name="protocolo" placeholder="1">
+        <label for="iddisciplina" style="display: none;">Disciplina (ID)</label>
+        <input type="hidden" id="iddisciplina" name="iddisciplina" value="385">
+        <label for="idtipo" style="display: none;">Tipo de nota (ID)</label>
+        <input type="hidden" id="idtipo" name="idtipo" value="1">
+        <label for="idmodelo"  style="display: none;">Modelo de prova (ID)</label>
+        <input type="hidden" id="idmodelo" name="idmodelo" value="0">
         <label for="choices">Número de escolhas</label>
         <input type="number" id="choices" name="choices" value="5">
         <label for="questons">Número de questões</label>
@@ -224,8 +223,11 @@
         function loadQrcode() {
             const url = "http://127.0.0.1:5000/encrypt"
             // const url = "https://gabarito-ibrep.onrender.com/encrypt"
-            choices = Number(document.getElementById("choices").value);
-            questions = Number(document.getElementById("questions").value);
+            c = Number(document.getElementById("choices").value);
+            q = Number(document.getElementById("questions").value);
+            d = Number(document.getElementById("iddisciplina").value)
+            t = Number(document.getElementById("idtipo").value)
+            m = Number(document.getElementById("idmodelo").value)
 
             qrcode = document.getElementById("qrcode")
 
@@ -233,7 +235,7 @@
             chosen = Array.from(document.querySelectorAll(".row > input[type='radio']:checked")).map(el => Number(el.value))
             if (chosen.length < questions) return
             body = {
-                "msg": `[${chosen.toString}]`
+                "msg": chosen.join("")
             }
 
             fetch(url, {
@@ -247,13 +249,16 @@
                 .then(res => res.text())
                 .then(text => JSON.parse(text))
                 .then(data => {
-                    chosen = data['msg']
+                    r = data['msg'] // respostas
                     removeAllChildren(qrcode);
                     new QRCode(qrcode, JSON.stringify({
-                        choices,
-                        questions,
-                        chosen
-                    }));
+                        r,
+                        c,
+                        q,
+                        d,
+                        t,
+                        m,
+                    })); // todos compactados para melhorar performance do qrcode
                 })
                 .catch(err => console.log(err));
         }

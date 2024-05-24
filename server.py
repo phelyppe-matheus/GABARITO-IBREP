@@ -44,8 +44,7 @@ def exam_review():
         if "correctAnswers" in exam:
             exam["correctAnswers"] = bytes(exam["chosen"], "utf-8")
             exam["correctAnswers"] = fernet.decrypt(exam["correctAnswers"]).decode("utf-8")
-            res["correctAnswers"] = exam["correctAnswers"]
-            exam["correctAnswers"] = ast.literal_eval(exam["correctAnswers"])
+            exam["correctAnswers"] = [*exam["correctAnswers"]]
             exam["correctAnswers"] = np.char.mod("%c", np.array(exam["correctAnswers"])+65).tolist()
 
             if len(exam["correctAnswers"]) == questionCount:

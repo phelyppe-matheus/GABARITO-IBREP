@@ -48,7 +48,7 @@ def exam_review():
         else:
             res['err']['noSheet'] = "Não pude reconhecer as questões"
         if "correctAnswers" in exam:
-            exam["correctAnswers"] = bytes(exam["chosen"], "utf-8")
+            exam["correctAnswers"] = bytes(exam["correctAnswers"], "utf-8")
             exam["correctAnswers"] = fernet.decrypt(exam["correctAnswers"]).decode("utf-8")
             exam["correctAnswers"] = [*exam["correctAnswers"]]
             exam["correctAnswers"] = np.char.mod("%c", np.array(exam["correctAnswers"]).astype(np.int16)+65).tolist()

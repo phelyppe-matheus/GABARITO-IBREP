@@ -2,7 +2,7 @@ def qrdata_to_examdata(qrdata):
     examdata = {}
     examdata["choicesCount"] = qrdata["c"]
     examdata["questionCount"] =  qrdata["q"]
-    examdata["chosen"] =  qrdata["r"]
+    examdata["correctAnswers"] = qrdata["r"]
 
     return examdata
 

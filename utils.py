@@ -1,7 +1,15 @@
 def qrdata_to_examdata(qrdata):
     examdata = {}
-    examdata["choicesCount"] = qrdata["choices"]
-    examdata["questionCount"] =  qrdata["questions"]
-    examdata["chosen"] =  qrdata["chosen"]
+    examdata["choicesCount"] = qrdata["c"]
+    examdata["questionCount"] =  qrdata["q"]
+    examdata["chosen"] =  qrdata["r"]
 
     return examdata
+
+def qrdata_to_resdata(qrdata):
+    resdata = {}
+    resdata["iddisciplina"] = qrdata["d"]
+    resdata["idtipo"] = qrdata["t"]
+    resdata["idmodelo"] = qrdata["m"]
+
+    return resdata

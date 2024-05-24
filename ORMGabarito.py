@@ -25,7 +25,8 @@ class AnswerSheetRecognitionModel:
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         return img
     
-    def getQrCodeData(self):
+    def getQrCodeData(self, path = None, base64=None, buffer=None):
+        self.loadimg(path, base64, buffer)
         return qreader.detect_and_decode(self.img)
 
     def setUp(self, questionCount, choiceCount, path = None, base64=None, buffer=None):
@@ -55,9 +56,11 @@ class AnswerSheetRecognitionModel:
             self.img = cv2.imread(self.path)
         elif base64:
             self.img = self.readb64(base64)
-        else:
+        elif buffer:
             nparr = np.frombuffer(buffer, np.uint8)
             self.img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        elif not hasattr(self, "img"):
+            raise Exception("missing image")
 
     def preProcessing(self, img, imgShape=(0,0)):
         if imgShape == (0,0):

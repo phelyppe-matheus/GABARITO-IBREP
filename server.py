@@ -22,10 +22,14 @@ def goto_capture():
 def exam_review():
     res = {"err": {}}
     try:
+        reviewer = AnswerSheetRecognitionModel()
         exam = request.json
+        qrcodeData = reviewer.getQrCodeData(exam["examPhoto"])[0]
+        exam.update(utils.qrdata_to_examdata(json.loads(qrcodeData)))
+        res.update(utils.qrdata_to_resdata(json.loads(qrcodeData)))
+
         questionCount = int(exam["questionCount"])
         choiceCount = int(exam["choicesCount"])
-        reviewer = AnswerSheetRecognitionModel()
         match exam["examPhotoType"]:
             case 0:
                 reviewer.setUp(questionCount, choiceCount, base64=exam["examPhoto"])
@@ -33,9 +37,6 @@ def exam_review():
                 reviewer.setUp(questionCount, choiceCount, buffer=exam["examPhoto"])
             case _:
                 res['err']['noSuchPhotoType'] = 'Please provide a valid examPhoto Type'
-        qrcodeData = reviewer.getQrCodeData()[0]
-        exam.update(utils.qrdata_to_examdata(json.loads(qrcodeData)))
-        res.update(utils.qrdata_to_resdata(json.loads(qrcodeData)))
         reviewer.recognise()
         if hasattr(reviewer, "studentsAnswers"):
             reviewer.kernelSize = 1

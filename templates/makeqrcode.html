@@ -206,7 +206,7 @@
             <h1>Gabarito</h1>
         </div>
     </div>
-    <div id="gabarito" class="gabarito">
+    <div id="info" class="info">
     </div>
     <div id="qrcode" class="qrcode"></div>
     <script>
@@ -238,11 +238,16 @@
             Array.from(column.children).map((row, i) => Array.from(row.children).map((cell, j) => {
                 cell.name=`choice${i}`;
                 cell.value = j;
-                cell.addEventListener("change", loadQrcode);
+                cell.addEventListener("change", () => {
+                    loadQrcode();
+                    loadInfo();
+                });
             } ))
 
             removeAllChildren(document.getElementById("gabarito"))
             document.getElementById("gabarito").appendChild(column)
+
+            return true;
         }
 
         function loadQrcode() {
@@ -288,6 +293,7 @@
                     })); // todos compactados para melhorar performance do qrcode
                 })
                 .catch(err => console.log(err));
+            return true;
         }
 
         function setElementValue(el, value) {
@@ -297,7 +303,7 @@
         }
 
         function loadInfo() {
-            gabarito = document.getElementById("gabarito");
+            info = document.getElementById("info");
 
             label = document.createElement("h3")
             label.classList.add("label")
@@ -311,21 +317,21 @@
             idtipo = Number(document.getElementById("idtipo").value)
             idmodelo = Number(document.getElementById("idmodelo").value)
 
-            removeAllChildren(gabarito)
-            gabarito.appendChild(setElementValue(label, "Respostas Corretas"))
-            gabarito.appendChild(setElementValue(info, chosen))
-            gabarito.appendChild(setElementValue(label, "Qtd alternativas"))
-            gabarito.appendChild(setElementValue(info, choices))
-            gabarito.appendChild(setElementValue(label, "Qtd perguntas"))
-            gabarito.appendChild(setElementValue(info, questions))
+            removeAllChildren(info)
+            info.appendChild(setElementValue(label, "Respostas Corretas"))
+            info.appendChild(setElementValue(info, chosen))
+            info.appendChild(setElementValue(label, "Qtd alternativas"))
+            info.appendChild(setElementValue(info, choices))
+            info.appendChild(setElementValue(label, "Qtd perguntas"))
+            info.appendChild(setElementValue(info, questions))
             label.classList.add("fixed")
             info.classList.add("fixed")
-            gabarito.appendChild(setElementValue(label, "Disciplina (ID)"))
-            gabarito.appendChild(setElementValue(info, choices))
-            gabarito.appendChild(setElementValue(label, "Tipo (ID)"))
-            gabarito.appendChild(setElementValue(info, choices))
-            gabarito.appendChild(setElementValue(label, "Modelo (ID)"))
-            gabarito.appendChild(setElementValue(info, choices))
+            info.appendChild(setElementValue(label, "Disciplina (ID)"))
+            info.appendChild(setElementValue(info, choices))
+            info.appendChild(setElementValue(label, "Tipo (ID)"))
+            info.appendChild(setElementValue(info, choices))
+            info.appendChild(setElementValue(label, "Modelo (ID)"))
+            info.appendChild(setElementValue(info, choices))
         }
 
         loadCells()
@@ -336,9 +342,12 @@
         document.addEventListener('swiped-right', function (e) {
             document.getElementById("dashboard").classList.remove("closed");
         });
-        Array.from(document.querySelectorAll("input")).map(el => el.addEventListener("change", loadQrcode))
-        Array.from(document.querySelectorAll("input")).map(el => el.addEventListener("change", loadInfo))
+        Array.from(document.querySelectorAll("input")).map(el => el.addEventListener("change", () => {
+            loadQrcode();
+            loadInfo();
+        }));
         Array.from(document.querySelectorAll("#choices, #questions")).map(el => el.addEventListener("change", loadCells))
+        Array.from(document.querySelectorAll("#choices, #questions")).map(el => el.addEventListener("click", loadCells))
     </script>
 </body>
 </html>

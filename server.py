@@ -24,7 +24,7 @@ def exam_review():
     try:
         reviewer = AnswerSheetRecognitionModel()
         exam = request.json
-        qrcodeData = reviewer.getQrCodeData(exam["examPhoto"])[0]
+        qrcodeData = reviewer.getQrCodeData(base64=exam["examPhoto"])[0]
         exam.update(utils.qrdata_to_examdata(json.loads(qrcodeData)))
         res.update(utils.qrdata_to_resdata(json.loads(qrcodeData)))
 

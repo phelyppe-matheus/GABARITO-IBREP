@@ -38,9 +38,6 @@
             place-items: center;
         }
 
-        .swal2-html-container .exam-pic-menu {
-            display: grid;
-        }
         .exam-pic-menu {
             display: none;
         }
@@ -130,12 +127,6 @@
             grid-column: 1/5;
         }
 
-        .video-container-overlay {
-            position: relative;
-            box-shadow: 0 0 0px calc(100vh + 100vw) #00000088;
-            z-index: 1;
-        }
-
         video {
             position: absolute;
             height: 100%;
@@ -152,20 +143,9 @@
     <title>Document Scanner</title>
 </head>
 <body>
-    <template id="exam-pic-menu">
-        <div class="exam-pic-menu" id="pic-menu">
-            <label for="question-count">Quantas questões no gabarito?</label>
-            <input type="number" id="question-count" onchange="questionCount=this.value; return true;">
-            <label for="choice-count">Quantas escolhas por questão?</label>
-            <input type="number" id="choice-count" onchange="choicesCount=this.value; return true;">
-            <label for="right-answers">Gabarito</label>
-            <input type="text" id="right-answers" onchange="rightAnswers=this.value.replaceAll(' ','').split(','); return true;">
-        </div>
-    </template>
     <div class="exam-pic-camera">
         <div class="video-container" data-aspect="0.25">
             <video id="webCam" autoplay playsinline></video>
-            <div class="video-container-overlay"></div>
         </div>
         <div class="canva-container">
             <canvas id="canvas"></canvas>
@@ -185,56 +165,17 @@
         const canvasToSend = document.getElementById("canvas-to-send");
         const webcam = new Webcam(webCamElement, "user", canvasElement);
 
+        var gabaritoData;
+        var errors;
         var questionCount;
         var choicesCount;
-        var rightAnswers;
 
         var imgBuffer;
-
-        Swal.fire({
-            title: "Menu",
-            html: document.getElementById('exam-pic-menu').content.getElementById('pic-menu').outerHTML,
-            focusConfirm: false,
-            preConfirm: () => {
-                return [
-                    document.getElementById("question-count").value,
-                    document.getElementById("choice-count").value,
-                    document.getElementById("right-answers").value
-                ];
-            }
-        });
 
         webcam.start()
             .catch((e) => {
                 console.log(e.constraint);
             });
-        
-        document.querySelectorAll('.video-container-overlay').forEach((e, _, __) => {
-            if (e.parentElement) {
-                setTimeout(() => {
-                    parentHeight = e.parentElement.getBoundingClientRect().height * 0.95
-                    parentWidth = e.parentElement.getBoundingClientRect().width * 0.95
-
-                    heightBasedH = parentHeight
-                    heightBasedW = parentHeight / (questionCount/choicesCount)
-                    widthBasedH = parentWidth / (choicesCount/questionCount)
-                    widthBasedW = parentWidth
-
-                    if (heightBasedW > parentWidth) {
-                        e.style.width = `${widthBasedW}px`;
-                        e.style.height = `${widthBasedH}px`;
-                    } else if (widthBasedH > parentHeight) {
-                        e.style.width = `${heightBasedW}px`;
-                        e.style.height = `${heightBasedH}px`;
-                    } else {
-                        e.style.width = `${Math.max(heightBasedW, widthBasedW)}px`;
-                        e.style.height = `${Math.max(heightBasedH, widthBasedH)}px`;
-                    }
-                }, 500);
-            } else {
-                e.remove()
-            }
-        });
 
         function snap() {
 
@@ -260,8 +201,7 @@
         }
 
         function send() {
-            // const url = "http://127.0.0.1:5000/api/exam/review"
-            const url = "https://gabarito-ibrep.onrender.com/api/exam/review"
+            const url = "/api/exam/review"
             body = {
                 "choicesCount": Number(choicesCount),
                 "questionCount": Number(questionCount),
@@ -281,8 +221,50 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    alert("Resposta: "+data["answers"])
-                    alert("Erro: "+JSON.stringify(data["err"]))
+                    gabaritoData = data["answers"]
+                    errors = data["err"]
+                })
+                .catch(err => console.log(err))
+                .finally(() => {
+                    document.body.classList.remove("loading")
+                })
+        }
+
+        function sendToApi() {
+            const url = "ava-dev.ibrep.com.br/api/set/score";
+            // const url = "localhost.ibrep.com.br/api/set/score";
+
+            cpf_aluno = window.prompt("digite o cpf do aluno em questão")
+            iddisciplina = gabaritoData["iddisciplina"]
+            nota = gabaritoData["score"]
+            idtipo = gabaritoData["idtipo"]
+            idmodelo = gabaritoData["idmodelo"]
+            protocolo = "prova final"
+
+            body = {
+                cpf_aluno,
+                iddisciplina,
+                nota,
+                idtipo,
+                idmodelo,
+                protocolo,
+            }
+
+            document.body.classList.add("loading")
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            })
+            .then(res => res.json())
+                .then(data => {
+                    if (data["status"] = 200) {
+                        alert("Concluido com sucesso");
+                    }
                 })
                 .catch(err => console.log(err))
                 .finally(() => {

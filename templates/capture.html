@@ -243,7 +243,7 @@
             const url = "https://ava-dev.ibrep.com.br/api/set/score";
             // const url = "localhost.ibrep.com.br/api/set/score";
 
-            cpf_aluno = window.prompt("digite o cpf do aluno em questão")
+            idmatricula = window.prompt("digite a matricula do aluno em questão")
             iddisciplina = gabaritoData["iddisciplina"]
             nota = gabaritoData["score"]
             idtipo = gabaritoData["idtipo"]
@@ -251,7 +251,7 @@
             protocolo = "prova final"
 
             body = {
-                cpf_aluno,
+                idmatricula,
                 iddisciplina,
                 nota,
                 idtipo,

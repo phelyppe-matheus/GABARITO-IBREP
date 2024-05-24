@@ -251,9 +251,7 @@
         }
 
         function loadQrcode() {
-            const url = "http://127.0.0.1:5000/encrypt"
-            // const url = "https://gabarito-ibrep.onrender.com/encrypt"
-            // const url = "http://ec2-3-85-14-89.compute-1.amazonaws.com/encrypt"
+            const url = "/encrypt"
 
             c = Number(document.getElementById("choices").value);
             q = Number(document.getElementById("questions").value);
@@ -292,7 +290,10 @@
                         m,
                     })); // todos compactados para melhorar performance do qrcode
                 })
-                .catch(err => console.log(err));
+                .catch(err => console.log(err))
+                .finally(() => {
+                    document.querySelector("#qrcode > img").download = true;
+                });
             return true;
         }
 

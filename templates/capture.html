@@ -166,7 +166,7 @@
         <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
         <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
         <button id="flip" onclick="webcam.flip();webcam.start();return true;" class="cam-opt"><i class="fa fa-rotate-right"></i></button>
-        <button id="menu" onclick="sendToApi()" class="cam-opt"><div class="ibrep-icon"></div></button>
+        <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button>
     </div>
     <script>
         const webCamElement = document.getElementById("webCam");
@@ -239,7 +239,7 @@
                 })
         }
 
-        function sendToApi() {
+        function sendToIbrep() {
             const url = "https://ava-dev.ibrep.com.br/api/set/score";
             // const url = "localhost.ibrep.com.br/api/set/score";
 
@@ -263,6 +263,7 @@
 
             fetch(url, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'

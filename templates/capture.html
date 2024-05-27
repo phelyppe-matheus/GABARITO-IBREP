@@ -230,9 +230,13 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    gabaritoData = data
+                    if (!("err" in data)) {
+                        gabaritoData = data
+                        return;
+                    }
                     errors = data["err"]
-                    alert(JSON.stringify(data, null, 2));
+
+                    Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
                 })
                 .catch(err => console.log(err))
                 .finally(() => {
@@ -268,10 +272,13 @@
             })
             .then(res => res.json())
                 .then(data => {
-                    if (data["status"] == 200) {
+                    if (!("err" in data)) {
                         alert("Concluido com sucesso");
+                        return;
                     }
-                    alert(JSON.stringify(data, null, 2));
+                    errors = data["err"]
+
+                    Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
                 })
                 .catch(err => alert(err))
                 .finally(() => {

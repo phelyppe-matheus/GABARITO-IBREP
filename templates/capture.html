@@ -234,9 +234,10 @@
                         gabaritoData = data
                         return;
                     }
-                    errors = data["err"]
+                    errors = data["err"];
 
-                    Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
+                    errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
+                    alert(errStr);
                 })
                 .catch(err => console.log(err))
                 .finally(() => {

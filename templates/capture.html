@@ -270,8 +270,8 @@
                 .then(data => {
                     if (data["status"] == 200) {
                         alert("Concluido com sucesso");
-                        alert(data);
                     }
+                    alert(data);
                 })
                 .catch(err => alert(err))
                 .finally(() => {

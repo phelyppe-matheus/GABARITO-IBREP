@@ -273,7 +273,7 @@
             .then(res => res.json())
                 .then(data => {
                     if (!("err" in data)) {
-                        alert("Concluido com sucesso");
+                        alert(`Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`);
                         return;
                     }
                     errors = data["err"]

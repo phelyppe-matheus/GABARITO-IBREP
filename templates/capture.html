@@ -232,6 +232,7 @@
                 .then(data => {
                     gabaritoData = data
                     errors = data["err"]
+                    alert(data);
                 })
                 .catch(err => console.log(err))
                 .finally(() => {

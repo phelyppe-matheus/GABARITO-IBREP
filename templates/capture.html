@@ -232,7 +232,7 @@
                 .then(data => {
                     gabaritoData = data
                     errors = data["err"]
-                    alert(JSON.stringify(data));
+                    alert(JSON.stringify(data, null, 2));
                 })
                 .catch(err => console.log(err))
                 .finally(() => {
@@ -271,7 +271,7 @@
                     if (data["status"] == 200) {
                         alert("Concluido com sucesso");
                     }
-                    alert(JSON.stringify(data));
+                    alert(JSON.stringify(data, null, 2));
                 })
                 .catch(err => alert(err))
                 .finally(() => {

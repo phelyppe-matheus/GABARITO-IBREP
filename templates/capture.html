@@ -232,15 +232,19 @@
                 .then(data => {
                     if (!("err" in data) || !!data["err"]) {
                         gabaritoData = data
-                        alert("Dados de gabarito e QR salvos");
+                        Swal.fire({
+                            text:"Dados de gabarito e QR salvos",
+                            icon: "success"
+                        });
                         return;
                     }
                     errors = data["err"];
 
                     errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-                    alert(errStr);
-                    alert(JSON.stringify(data));
-                    alert(!("err" in data));
+                    Swal.fire({
+                        text: errStr,
+                        icon: "error"
+                    });
                 })
                 .catch(err => console.log(err))
                 .finally(() => {
@@ -277,14 +281,23 @@
             .then(res => res.json())
                 .then(data => {
                     if (!("err" in data)) {
-                        alert(`Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`);
+                        Swal.fire({
+                            text: `Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`,
+                            icon: "success",
+                        });
                         return;
                     }
                     errors = data["err"]
 
-                    Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
+                    errorStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
+                    Swal.fire({
+                        text: errStr,
+                        icon: "error"
+                    });
                 })
-                .catch(err => alert(err))
+                .catch(err => Swal.fire({
+                    text: err
+                }))
                 .finally(() => {
                     document.body.classList.remove("loading")
                 })

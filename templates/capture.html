@@ -230,8 +230,17 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    gabaritoData = data
-                    errors = data["err"]
+                    if (!("err" in data) || !!data["err"]) {
+                        gabaritoData = data
+                        alert("Dados de gabarito e QR salvos");
+                        return;
+                    }
+                    errors = data["err"];
+
+                    errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
+                    alert(errStr);
+                    alert(JSON.stringify(data));
+                    alert(!("err" in data));
                 })
                 .catch(err => console.log(err))
                 .finally(() => {
@@ -267,10 +276,13 @@
             })
             .then(res => res.json())
                 .then(data => {
-                    if (data["status"] == 200) {
-                        alert("Concluido com sucesso");
-                        alert(data);
+                    if (!("err" in data)) {
+                        alert(`Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`);
+                        return;
                     }
+                    errors = data["err"]
+
+                    Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
                 })
                 .catch(err => alert(err))
                 .finally(() => {

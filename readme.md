@@ -34,5 +34,7 @@ _JSON_
 |noSuchPhotoType|Tipo inválido de imagem|
 |noSheet|Não foi possível encontrar o gabarito na imagem|
 |tipo|Tipo errado nos campos json|
+|answers|Número errado de respostas|
 |duplicate|Mais de uma alternativa marcada|
 |unknown|Erro ainda não documentado|
+

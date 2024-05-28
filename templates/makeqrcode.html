@@ -9,7 +9,7 @@
         integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Faça aqui o seu qrcode 2</title>
+    <title>Faça aqui o seu qrcode</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@100..900&display=swap');
 
@@ -219,7 +219,7 @@
             display: grid;
             height: 100vh;
             padding: 2rem;
-            grid-template-columns: 1fr 1fr 10rem;
+            grid-template-columns: 2fr 2fr 1fr;
             grid-template-rows: repeat(3, min-content) 1fr;
             gap: var(--gap);
             place-items: center;
@@ -301,7 +301,7 @@
 
         .test .qrcode {
             grid-area: 2/3/3/4;
-            width: 100%;
+            height: 10rem;
             visibility: visible;
             isolation: isolate;
             display: block;

@@ -238,9 +238,9 @@
                     errors = data["err"];
 
                     errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-                    alert(errStr);
-                    alert(JSON.stringify(data));
-                    alert(!("err" in data));
+                    Swal.fire({
+                        text: errStr
+                    });
                 })
                 .catch(err => console.log(err))
                 .finally(() => {

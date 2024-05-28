@@ -230,7 +230,7 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (!("err" in data) || !!data["err"]) {
+                    if (!("err" in data) && !!data["err"]) {
                         gabaritoData = data
                         Swal.fire({
                             text:"Dados de gabarito e QR salvos",
@@ -280,7 +280,7 @@
             })
             .then(res => res.json())
                 .then(data => {
-                    if (!("err" in data)) {
+                    if (!("err" in data) && !!data["err"]) {
                         Swal.fire({
                             text: `Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`,
                             icon: "success",

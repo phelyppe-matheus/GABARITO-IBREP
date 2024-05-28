@@ -380,16 +380,23 @@
         }
 
         @media print {
+            html, body {
+                height:100%; 
+                margin: 0 !important; 
+                padding: 0 !important;
+                overflow: hidden;
+            }
+
             body>* {
                 visibility: hidden;
             }
 
-            body .test {
+            .test {
                 visibility: visible;
                 padding: 0;
             }
 
-            body .test .test-body .gabarito {
+            .test .test-body .gabarito {
                 display: grid;
             }
 

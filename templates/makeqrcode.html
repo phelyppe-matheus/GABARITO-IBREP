@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="{{url_for('static', filename='swiped-events.js')}}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+        integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Faça aqui o seu qrcode</title>
     <style>
@@ -29,8 +32,27 @@
             list-style-position: inside;
         }
 
-        p, h1, h2, h3, h4, li, a, span {
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        li,
+        a,
+        span {
             text-wrap: pretty;
+        }
+
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
         }
 
         .dashboard {
@@ -70,18 +92,21 @@
                 box-shadow:
                     -100vw 0 0 0 black inset;
             }
+
             60% {
                 right: 10%;
                 box-shadow:
                     -100vw 0 0 0 rgb(144, 2, 157) inset,
                     -100vw 0 0 0 rgb(5, 142, 241) inset;
             }
+
             70% {
                 right: 10%;
                 box-shadow:
                     -0vw 0 0 0 rgb(144, 2, 157) inset,
                     -100vw 0 0 0 rgb(5, 142, 241) inset;
             }
+
             100% {
                 right: auto;
                 box-shadow:
@@ -96,18 +121,21 @@
                 box-shadow:
                     -100vw 0 0 0 black inset;
             }
+
             40% {
                 right: 10%;
                 box-shadow:
                     -100vw 0 0 0 rgb(144, 2, 157) inset,
                     -100vw 0 0 0 rgb(5, 142, 241) inset;
             }
+
             30% {
                 right: 10%;
                 box-shadow:
                     -0vw 0 0 0 rgb(144, 2, 157) inset,
                     -100vw 0 0 0 rgb(5, 142, 241) inset;
             }
+
             0% {
                 right: auto;
                 box-shadow:
@@ -214,7 +242,7 @@
             width: 100%;
             grid-area: 1/1/2/2;
         }
-        
+
         .test .test-title .title-left {
             text-align: right;
             grid-area: 1/2/2/4;
@@ -262,6 +290,7 @@
         .test .test-header>* {
             position: relative;
         }
+
         .test .test-header>*::after {
             content: ":";
             border-bottom: 1px black solid;
@@ -298,6 +327,7 @@
             grid-area: 4/1/5/4;
             height: 100%;
         }
+
         .test .test-body .gabarito {
             --choices: 5;
             --questions: 20;
@@ -323,6 +353,7 @@
             body {
                 display: block;
             }
+
             .dashboard {
                 position: absolute;
                 width: 90%;
@@ -372,14 +403,15 @@
         button.control:hover {
             background-color: aquamarine;
         }
-
     </style>
 </head>
+
 <body>
     <div class="test">
 
         <div class="test-title">
-            <img src="https://corretorcursoadistancia.com.br/wp-content/uploads/2023/08/logotipo_ibrep-prreto-55-min-1.png" alt="logo ibrep">
+            <img src="https://corretorcursoadistancia.com.br/wp-content/uploads/2023/08/logotipo_ibrep-prreto-55-min-1.png"
+                alt="logo ibrep">
             <h1 class="title-left"><span>Curso</span>Técnico em transações imobiliárias</h1>
         </div>
         <div class="test-header">
@@ -416,7 +448,7 @@
         <input type="hidden" id="iddisciplina" name="iddisciplina" value="385">
         <label for="idtipo" style="display: none;">Tipo de nota (ID)</label>
         <input type="hidden" id="idtipo" name="idtipo" value="1">
-        <label for="idmodelo"  style="display: none;">Modelo de prova (ID)</label>
+        <label for="idmodelo" style="display: none;">Modelo de prova (ID)</label>
         <input type="hidden" id="idmodelo" name="idmodelo" value="0">
         <label for="choices">Número de escolhas</label>
         <input type="number" id="choices" name="choices" value="5">
@@ -458,13 +490,13 @@
             }
 
             Array.from(column.children).map((row, i) => Array.from(row.children).map((cell, j) => {
-                cell.name=`choice${i}`;
+                cell.name = `choice${i}`;
                 cell.value = j;
                 cell.addEventListener("change", () => {
                     loadQrcode();
                     loadInfo();
                 });
-            } ))
+            }))
 
             removeAllChildren(document.getElementById("gabarito"))
             document.getElementById("gabarito").appendChild(column)
@@ -577,4 +609,5 @@
         Array.from(document.querySelectorAll("#choices, #questions")).map(el => el.addEventListener("click", loadCells))
     </script>
 </body>
+
 </html>

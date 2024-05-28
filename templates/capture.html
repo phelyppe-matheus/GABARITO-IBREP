@@ -230,21 +230,17 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (!("err" in data) && !!data["err"]) {
+                    if (!("err" in data) || !!data["err"]) {
                         gabaritoData = data
-                        Swal.fire({
-                            text:"Dados de gabarito e QR salvos",
-                            icon: "success"
-                        });
+                        alert("Dados de gabarito e QR salvos");
                         return;
                     }
                     errors = data["err"];
 
                     errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-                    Swal.fire({
-                        text: errStr,
-                        icon: "error"
-                    });
+                    alert(errStr);
+                    alert(JSON.stringify(data));
+                    alert(!("err" in data));
                 })
                 .catch(err => console.log(err))
                 .finally(() => {
@@ -280,24 +276,15 @@
             })
             .then(res => res.json())
                 .then(data => {
-                    if (!("err" in data) || !!data["err"]) {
-                        Swal.fire({
-                            text: `Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`,
-                            icon: "success",
-                        });
+                    if (!("err" in data)) {
+                        alert(`Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`);
                         return;
                     }
                     errors = data["err"]
 
-                    errorStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
-                    Swal.fire({
-                        text: errStr,
-                        icon: "error"
-                    });
+                    Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
                 })
-                .catch(err => Swal.fire({
-                    text: err
-                }))
+                .catch(err => alert(err))
                 .finally(() => {
                     document.body.classList.remove("loading")
                 })

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Faça aqui o seu qrcode</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
         * {
             font-family: 'Work Sans', sans-serif;
@@ -375,8 +375,14 @@
             position: absolute;
             aspect-ratio: auto !important;
             border: none !important;
-            margin: 0;
+            margin: 0 !important;
             text-align: end;
+            font-family: "Space Mono", monospace;
+        }
+
+        .gabarito p {
+            font-family: inherit;
+            text-transform: uppercase;
         }
 
         .gabarito .rowlabel {
@@ -392,7 +398,7 @@
             height: 100%;
             right: 100%;
             padding: 0 0.3rem;
-            width: auto;
+            width: auto !important;
         }
 
         @media (max-width: 1000.0000000000001px) {
@@ -554,7 +560,7 @@
                 column.appendChild(row.cloneNode(true))
                 Array.from(row.cloneNode(true).children).map(el => allChoices.appendChild(document.createElement("div")))
                 const p = document.createElement('p');
-                p.innerText = i
+                p.innerText = (1+i).toString().padStart(2, "0")
                 columnlabel.appendChild(p);
             }
 

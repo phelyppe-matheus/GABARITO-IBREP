@@ -87,7 +87,7 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (!("err" in data) || !!data["err"]) {
+                    if (!("err" in data) || !data["err"]) {
                         gabaritoData = data
                         alert("Dados de gabarito e QR salvos");
                         return;
@@ -95,9 +95,9 @@
                     errors = data["err"];
 
                     errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-                    alert(errStr);
-                    alert(JSON.stringify(data));
-                    alert(!("err" in data));
+                    Swal.fire({
+                        text: errStr
+                    });
                 })
                 .catch(err => console.log(err))
                 .finally(() => {
@@ -106,7 +106,7 @@
         }
 
         function sendToIbrep() {
-            const url = "https://ava-dev.ibrep.com.br/api/set/score";
+            const url = "https://ibrep.alfamaoraculo.com.br/api/set/score";
             // const url = "localhost.ibrep.com.br/api/set/score";
 
             idmatricula = window.prompt("digite a matricula do aluno em questão")

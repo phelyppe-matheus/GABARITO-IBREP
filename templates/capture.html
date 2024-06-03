@@ -99,7 +99,8 @@
 
                     errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
                     Swal.fire({
-                        text: errStr
+                        text: errStr,
+                        icon: "error"
                     });
                 })
                 .catch(err => console.log(err))
@@ -135,19 +136,23 @@
                 body: JSON.stringify(body)
             })
             .then(res => res.json())
-                .then(data => {
-                    if (!("err" in data)) {
-                        alert(`Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`);
-                        return;
-                    }
-                    errors = data["err"]
+            .then(data => {
+                if (!("err" in data)) {
+                    alert(`Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`);
+                    return;
+                }
+                errors = data["err"]
 
-                    Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1)
-                })
-                .catch(err => alert(err))
-                .finally(() => {
-                    document.body.classList.remove("loading")
-                })
+                errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
+                Swal.fire({
+                    text: errStr,
+                    icon: "error"
+                });
+            })
+            .catch(err => alert(err))
+            .finally(() => {
+                document.body.classList.remove("loading")
+            })
         }
     </script>
 </body>

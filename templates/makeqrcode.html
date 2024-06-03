@@ -60,6 +60,18 @@
             animation: swipe-right 500ms ease-in-out;
         }
 
+        /* Chrome, Safari, Edge, Opera */
+        .dashboard input::-webkit-outer-spin-button,
+        .dashboard input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        .dashboard input[type=number] {
+            -moz-appearance: textfield;
+        }
+
         .dashboard.closed {
             animation: swipe-left 500ms ease-in-out forwards;
         }
@@ -144,6 +156,10 @@
             justify-self: center;
             align-self: center;
             grid-area: 1/3/6/4;
+        }
+
+        .dashboard .gabarito:has(.columnlabel) {
+            margin-left: 1rem;
         }
 
         .dashboard .gabarito .column {
@@ -319,6 +335,32 @@
             border: 1px black solid;
         }
 
+        .gabarito .rowlabel,
+        .gabarito .columnlabel {
+            justify-content: space-around;
+            position: absolute;
+            aspect-ratio: auto !important;
+            border: none !important;
+            margin: 0;
+            text-align: end;
+        }
+
+        .gabarito .rowlabel {
+            display: flex;
+            flex-direction: row;
+            width: 100% !important;
+            bottom: 100%;
+            padding: 0.3rem 0;
+        }
+        .gabarito .columnlabel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            right: 100%;
+            padding: 0 0.3rem;
+            width: auto;
+        }
+
         @media (max-width: 1000.0000000000001px) {
             body {
                 display: block;
@@ -355,6 +397,7 @@
 
             body .test .test-body .gabarito {
                 display: grid;
+                position: relative;
             }
         }
 
@@ -441,8 +484,12 @@
             questions = document.getElementById("questions");
 
             allChoices = document.createElement("div")
+            columnlabel = document.createElement("div")
+            columnlabel.classList.add("columnlabel")
             column = document.createElement("div")
             column.classList.add("column")
+            rowlabel = document.createElement("div")
+            rowlabel.classList.add("rowlabel")
             row = document.createElement("div")
             row.classList.add("row")
             cell = document.createElement("input")
@@ -451,10 +498,16 @@
 
             for (let i = 0; i < choices.value; i++) {
                 row.appendChild(cell.cloneNode())
+                const p = document.createElement('p');
+                p.innerText = String.fromCharCode(97+i)
+                rowlabel.appendChild(p);
             }
             for (let i = 0; i < questions.value; i++) {
                 column.appendChild(row.cloneNode(true))
                 Array.from(row.cloneNode(true).children).map(el => allChoices.appendChild(document.createElement("div")))
+                const p = document.createElement('p');
+                p.innerText = i
+                columnlabel.appendChild(p);
             }
 
             Array.from(column.children).map((row, i) => Array.from(row.children).map((cell, j) => {
@@ -467,9 +520,13 @@
             } ))
 
             removeAllChildren(document.getElementById("gabarito"))
+            document.getElementById("gabarito").appendChild(rowlabel.cloneNode(true))
+            document.getElementById("gabarito").appendChild(columnlabel.cloneNode(true))
             document.getElementById("gabarito").appendChild(column)
 
             removeAllChildren(document.getElementById("test-gabarito"))
+            document.getElementById("test-gabarito").appendChild(rowlabel.cloneNode(true))
+            document.getElementById("test-gabarito").appendChild(columnlabel.cloneNode(true))
             Array.from(allChoices.children).map(el => document.getElementById("test-gabarito").appendChild(el))
 
             return true;

@@ -109,11 +109,19 @@
                 })
         }
 
-        function sendToIbrep() {
+        async function sendToIbrep() {
             const url = "https://ibrep.alfamaoraculo.com.br/api/set/score";
             // const url = "localhost.ibrep.com.br/api/set/score";
 
-            idmatricula = window.prompt("digite a matricula do aluno em questão")
+            idmatricula = await Swal.fire({
+                title: "digite a matricula do aluno em questão",
+                html: '<input id="idmatricula" class="swal2-input">',
+                focusConfirm: false,
+                preConfirm: () => {
+                    return document.getElementById("idmatricula").value;
+                }
+            })
+                .then(data => data.value)
             iddisciplina = gabaritoData["iddisciplina"]
             nota = gabaritoData["score"]
             idtipo = gabaritoData["idtipo"]
@@ -138,7 +146,10 @@
             .then(res => res.json())
             .then(data => {
                 if (!("err" in data)) {
-                    alert(`Aluno: ${data["aluno"][0]["aluno"]}\nNota: ${data['nota']}`);
+                    Swal.fire({
+                        html: `<div>Aluno: ${data["aluno"][0]["aluno"]}</div><div>\nNota: ${data['nota']}</div>`,
+                        icon: 'success'
+                    });
                     return;
                 }
                 errors = data["err"]
@@ -146,10 +157,13 @@
                 errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
                 Swal.fire({
                     text: errStr,
-                    icon: "error"
+                    icon: 'error'
                 });
             })
-            .catch(err => alert(err))
+            .catch(err => Swal.fire({
+                text: err,
+                icon: 'error'
+            }))
             .finally(() => {
                 document.body.classList.remove("loading")
             })

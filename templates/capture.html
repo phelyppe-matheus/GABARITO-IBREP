@@ -7,159 +7,19 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" type="image/svg" href="/favicon.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        /* HTML: <div class="loader"></div> */
-        body.loading::after {
-            content: "";
-            display: block;
-            position: fixed;
-            height: 100vh;
-            width: 100vw;
-
-            background-color: hsl(120, 51%, 29%);
-            inset: 10;
-
-            animation: loading 1500ms ease-in-out 0s infinite;
-        }
-
-        @keyframes loading {
-            0% {filter: opacity(0);}
-            50% {filter: opacity(0.3);}
-            100% {filter: opacity(0);}
-        }
-
-        body {
-            display: grid;
-            margin: 0;
-            place-items: center;
-        }
-
-        .exam-pic-menu {
-            display: none;
-        }
-
-        .exam-pic-camera {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            grid-template-rows: 1fr auto auto 0;
-
-            aspect-ratio: 9/16;
-            grid-template-areas:
-                ". . . ."
-                "opt5 . . opt6"
-                "opt1 opt2 opt3 opt4"
-                ". . . .";
-            gap: 1rem;
-            place-content: center;
-            place-items: center;
-            isolation: isolate;
-            height: 100vh;
-            height: 100dvh;
-        }
-
-        .cam-opt {
-            z-index: 2;
-
-            background-color: blueviolet;
-            color: lightgray;
-            bottom: 10px;
-
-            height: 3rem;
-            aspect-ratio: 1;
-            border: none;
-            border-radius: 100%;
-
-            text-transform: uppercase;
-        }
-        .cam-opt p {
-            padding: 0;
-            margin: 0;
-        }
-
-        .cam-opt#snap {
-            background-color: hsl(0, 51%, 29%);
-            grid-area: opt3;
-        }
-
-        .cam-opt#send {
-            background-color: hsl(120, 51%, 29%);
-            right: 10px;
-            grid-area: opt4;
-        }
-
-        .cam-opt#retry {
-            background-color: hsl(53, 51%, 29%);
-            left: 10px;
-            grid-area: opt1;
-        }
-
-        .cam-opt#flip {
-            grid-area: opt2;
-        }
-
-        .cam-opt#menu {
-            grid-area: opt6;
-        }
-
-        .cam-opt:active {
-            background-color: darkblue;
-        }
-
-        .cam-opt:hover {
-            background-color: dodgerblue;
-        }
-
-        .video-container, .canva-container {
-            display: grid;
-            place-content: center;
-            place-items: center;
-            position: relative;
-            aspect-ratio: 9/16;
-
-            overflow: hidden;
-            height: 100vh;
-            height: 100dvh;
-            grid-row: 1/-1;
-            grid-column: 1/5;
-        }
-
-        video {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-        }
-
-        canvas {
-            position: fixed;
-            bottom: 110%;
-        }
-        
-
-        .ibrep-icon {
-            clip-path: path("M17.5 1.5C11.9835 1.5 7.5 6.03497 7.5 11.6435C7.5 13.6772 8.08956 15.5696 9.10431 17.1563C11.1205 14.746 14.1327 13.213 17.5 13.213C20.8673 13.213 23.8795 14.746 25.8957 17.1563C26.9104 15.5696 27.5 13.6772 27.5 11.6435C27.5 6.03497 23.0165 1.5 17.5 1.5ZM26.536 18C27.7743 16.1967 28.5 14.005 28.5 11.6435C28.5 5.49552 23.5815 0.5 17.5 0.5C11.4185 0.5 6.5 5.49552 6.5 11.6435C6.5 14.005 7.22568 16.1967 8.46401 18C7.22568 19.8033 6.5 21.995 6.5 24.3565C6.5 30.5045 11.4185 35.5 17.5 35.5C23.5815 35.5 28.5 30.5045 28.5 24.3565C28.5 21.995 27.7743 19.8033 26.536 18ZM25.2934 18C23.4587 15.6886 20.6484 14.213 17.5 14.213C14.3516 14.213 11.5413 15.6886 9.70662 18C11.5413 20.3114 14.3516 21.787 17.5 21.787C20.6484 21.787 23.4587 20.3114 25.2934 18ZM9.10431 18.8437C11.1205 21.254 14.1327 22.787 17.5 22.787C20.8673 22.787 23.8795 21.254 25.8957 18.8437C26.9104 20.4304 27.5 22.3228 27.5 24.3565C27.5 29.965 23.0165 34.5 17.5 34.5C11.9835 34.5 7.5 29.965 7.5 24.3565C7.5 22.3228 8.08956 20.4304 9.10431 18.8437Z");
-            height: 36px;
-            aspect-ratio: 1;
-            background-color: white;
-            scale: .8;
-        }
-
-    </style>
+    <link rel="stylesheet" href="clear.css">
+    <link rel="stylesheet" href="capture.css">
     <title>Document Scanner</title>
 </head>
 <body>
     <div class="exam-pic-camera">
-        <div class="video-container" data-aspect="0.25">
+        <div class="video-container">
             <video id="webCam" autoplay playsinline></video>
         </div>
-        <div class="canva-container">
+        <div class="float-canva canva-container">
             <canvas id="canvas"></canvas>
         </div>
-        <div class="final-output">
+        <div class="float-canva final-output">
             <canvas id="canvas-to-send"></canvas>
         </div>
         <button id="snap" onclick="snap(); return true;" class="cam-opt" download><i class="fa fa-camera"></i></button>
@@ -196,15 +56,12 @@
                 canvasToSend.height = image.height;
                 canvasToSend.width = image.width;
                 canvasToSend.getContext("2d").drawImage(image, 0, 0);
-                canvasElement.style.position = "unset";
-                webCamElement.parentElement.style.position = "absolute";
                 webCamElement.parentElement.style.zIndex = "-1";
             }
         }
 
         function retry() {
             canvasToSend.getContext("2d").clearRect(0, 0, canvasToSend.width, canvasToSend.height);
-            canvasElement.style.position = "fixed";
             webCamElement.parentElement.style.position = "relative";
             webCamElement.parentElement.style.zIndex = "0";
         }

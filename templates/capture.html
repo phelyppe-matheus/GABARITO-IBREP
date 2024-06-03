@@ -89,7 +89,10 @@
                 .then(data => {
                     if (!("err" in data) || Object.entries(!data["err"]).length === 0) {
                         gabaritoData = data
-                        alert("Dados de gabarito e QR salvos");
+                        Swal.fire({
+                            text: "Dados de gabarito e QR salvos",
+                            icon: "success"
+                        });
                         return;
                     }
                     errors = data["err"];

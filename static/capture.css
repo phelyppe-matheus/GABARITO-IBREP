@@ -1,12 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 body {
+    --bggap: 2px;
+    --bgopacity: 0.1;
+    --bgsolid: black;
+    --ibrepblue: hsla(194, 100%, 55%, var(--bgopacity));
+    --ibrepviolet: hsla(297, 100%, 32%, var(--bgopacity));
     height: 100vh;
     width: 100vw;
     display: grid;
     place-content: center;
 
     font-family: "Work Sans", 'Courier New', Courier, monospace;
+
+    background-color: var(--bgsolid);
+    background:
+        radial-gradient(circle at 20px -10px, var(--bgsolid), var(--bgsolid) 20px, transparent 20px),
+        radial-gradient(circle at 20px 10px, var(--ibrepviolet), var(--ibrepviolet) 20px, transparent 20px),
+        radial-gradient(circle at 20px 40px, var(--bgsolid), var(--bgsolid) 20px, transparent 20px),
+        radial-gradient(circle at 20px 20px, var(--ibrepblue), var(--ibrepblue) 20px, transparent 20px),
+        radial-gradient(circle at 20px -10px, var(--bgsolid), var(--bgsolid) 20px, transparent 20px),
+        radial-gradient(circle at 20px 10px, var(--ibrepviolet), var(--ibrepviolet) 20px, transparent 20px),
+        radial-gradient(circle at 20px 40px, var(--bgsolid), var(--bgsolid) 20px, transparent 20px),
+        radial-gradient(circle at 20px 20px, var(--ibrepblue), var(--ibrepblue) 20px, transparent 20px),
+        var(--bgsolid)
+    ;
+    background-size: calc(80px + 2*var(--bggap)) calc(60px + var(--bggap));
+    background-position:
+        0 0, 0 0,
+        0 calc(30px + var(--bggap)), 0 calc(30px + var(--bggap)),
+        calc(40px + var(--bggap)) 30px, calc(40px + var(--bggap)) 30px,
+        calc(40px + var(--bggap)) 0, calc(40px + var(--bggap)) 0;
+    background-origin: center;
 }
 
 button {

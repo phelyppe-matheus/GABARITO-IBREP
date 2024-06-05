@@ -1,0 +1,27 @@
+
+
+@media (max-width: 1000.0000000000001px) {
+    body {
+        display: block;
+    }
+
+    .dashboard {
+        position: absolute;
+        width: 90%;
+        padding: 2rem;
+        grid-template-rows: repeat(4, min-content);
+        grid-template-columns: 1fr 2rem;
+    }
+
+    .dashboard .gabarito {
+        grid-area: auto/1/auto/3;
+    }
+
+    .dashboard h1 {
+        grid-area: 1/1/2/3;
+    }
+
+    .test {
+        visibility: hidden;
+    }
+}

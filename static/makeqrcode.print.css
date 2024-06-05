@@ -1,0 +1,35 @@
+
+@media print {
+    html, body {
+        height:100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden;
+    }
+
+    body>* {
+        visibility: hidden;
+    }
+
+    .test {
+        visibility: visible;
+        padding: 0;
+    }
+
+    .test .test-body .gabarito {
+        display: grid;
+    }
+
+    .test .qrcode>* {
+        height: 100%;
+    }
+    
+    @page {
+        margin: 0;
+    }
+
+    body {
+        box-sizing: border-box;
+        padding: 1.6cm !important;
+    }
+}

@@ -62,6 +62,24 @@ class AnswerSheetRecognitionModel:
         elif not hasattr(self, "img"):
             raise Exception("missing image")
 
+    def markCorrectAnswers(self, correctAnswers):
+        imgMarked = cv2.cvtColor(self.imgWarp, cv2.COLOR_GRAY2RGB)
+
+        for i in range(self.questionCount):
+            y = i*self.bs
+            xc = (ord(correctAnswers[i])-65)*self.choiceWidth
+            xs = self.studentsAnswers[i]*self.choiceWidth
+            h = self.choiceWidth
+            w = self.choiceWidth
+
+            if xc == xs:
+                imgMarked = cv2.circle(imgMarked, (xc+w//2, y+h//2), 30, (0, 255, 0), -1)
+            if xc != xs:
+                imgMarked = cv2.circle(imgMarked, (xs+w//2, y+h//2), 30, (0, 0, 255), -1)
+                imgMarked = cv2.circle(imgMarked, (xc+w//2, y+h//2), 30, (255, 0, 0), -1)
+
+        return imgMarked
+
     def preProcessing(self, img, imgShape=(0,0)):
         if imgShape == (0,0):
             imgShape = (self.imgWidth, self.imgWidth)
@@ -126,28 +144,18 @@ class AnswerSheetRecognitionModel:
         self.bs=bs
 
         return self.imgWarp
-    
+
     def getChoice(self, r, c):
         return self.imgWarp[self.bs*r:self.bs*(r+1), self.bs*c:self.bs*(c+1)]
-    
+
     def getAnswers(self):
         self.answersProb = np.zeros((self.questionCount, self.choiceCount))
-        # _, __, ___, imgCanny = self.preProcessing(self.imgWarp)
-        # contours = self.findContour(imgCanny)
-        # for i in range(len(contours)):
-        #     contour = self.scalePoints(contours[i],700/self.imgWidth,700*19/self.imgWidth)
-        #     poly = cv2.fillPoly(self.imgWarp, contour, (0, 255, 0))
 
         kernelSize = self.kernelSize if hasattr(self, "kernelSize") else 0.3*((self.bs-1)*0.5 - 1) + 0.8
 
-        gaussian2D = np.zeros((self.choiceWidth, self.choiceWidth))
-        gaussian2D[self.choiceWidth//2, self.choiceWidth//2] = 1
-        gaussian2D = cv2.GaussianBlur(gaussian2D, ((self.choiceWidth//2)*2-3, (self.choiceWidth//2)*2-3), 0)
         answerKernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(kernelSize), int(kernelSize)))
         answerKernel = np.pad(answerKernel,(math.floor((self.choiceWidth-kernelSize)/2), math.ceil((self.choiceWidth-kernelSize)/2)))
-        clearSpace = (-answerKernel+1)*gaussian2D
         answerKernel = answerKernel / answerKernel.sum()
-        clearSpace = clearSpace / clearSpace.sum()
 
         for i in range(self.questionCount):
             for j in range(self.choiceCount):
@@ -179,16 +187,22 @@ if __name__ == '__main__':
         "test_04": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
         "test_05": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
         "test_06": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_07": ['d','c','d','c','d','c','b','d','e','c','b','a','?','d','e','c','b','a','d'],
+        "test_07": ['D','C','D','C','D','C','B','D','E','C','B','A','?','D','E','C','B','A','D'],
         "test_08": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
         "test_09": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_10": ['c','?','c','?','c','d','?','b','d','b','c','d','c','?','e','c','b','a','c'],
-        "test_11": ['e','?','?','?','c','?','d','c','e','c','d','e','?','?','?','?','?','?','?'],
-        "test_12": ['c','?','c','?','c','d','?','b','d','b','c','d','c','?','e','c','b','a','c'],
-        "test_13": ["e","d","c","b","c","b","c","d","c","d","d","c","b","d","c","b","c","d","e"],
-        "test_14": ["e","d","c","b","c","b","c","d","c","d","d","c","b","d","c","b","c","d","e"],
-        "test_15": ["e","d","c","b","c","b","c","d","c","d","d","c","b","d","c","b","c","d","e"],
-        "test_16": ['d','c','d','c','d','c','b','d','e','c','b','a','?','d','e','c','b','a','d'],
-        "test_17": [],
+        "test_10": ['C','?','C','?','C','D','?','B','D','B','C','D','C','?','E','C','B','A','C'],
+        "test_11": ['E','?','?','?','C','?','D','C','E','C','D','E','?','?','?','?','?','?','?'],
+        "test_12": ['C','?','C','?','C','D','?','B','D','B','C','D','C','?','E','C','B','A','C'],
+        "test_13": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
+        "test_14": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
+        "test_15": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
+        "test_16": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D'],
     }
 
+    impath = "test/test_16.jpg"
+    asrm = AnswerSheetRecognitionModel()
+    asrm.setUp(19, 5,  impath)
+    asrm.recognise()
+    imgMarked = asrm.markCorrectAnswers(tests["test_16"])
+    cv2.imshow("Marked", cv2.resize(imgMarked, (30*5, 30*19)))
+    cv2.waitKey()

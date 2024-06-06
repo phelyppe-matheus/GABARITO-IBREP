@@ -85,38 +85,41 @@
             tagName = "input",
             choices = document.getElementById("choices").value,
             questions = document.getElementById("questions").value,
-            gabaritoList = Array.from(document.getElementsByClassName("gabarito"))
+            gabaritoList = Array.from(document.getElementsByClassName("gabarito")),
+            classes=[]
         } = {}) {
-            allChoices = document.createElement("div")
-            columnlabel = document.createElement("label")
-            columnlabel.classList.add("columnlabel")
-            rowlabel = document.createElement("label")
-            rowlabel.classList.add("rowlabel")
-            cell = document.createElement(tagName)
-            cell.type = "radio"
-            cell.classList.add("choice")
+            allChoices = document.createElement("div");
+            columnlabel = document.createElement("label");
+            columnlabel.classList.add("columnlabel");
+            rowlabel = document.createElement("label");
+            rowlabel.classList.add("rowlabel");
+            cell = document.createElement(tagName);
+            cell.type = "radio";
+            cell.classList.add("choice");
+            classes ? classes.map(cl => cl?cell.classList.add(cl):false):false;
 
             for (let i = 0; i < choices; i++) {
                 const p = document.createElement('p');
-                p.innerText = String.fromCharCode(97+i)
+                p.innerText = String.fromCharCode(97+i);
                 rowlabel.appendChild(p);
             }
             for (let i = 0; i < questions; i++) {
                 const p = document.createElement('p');
-                p.innerText = (1+i).toString().padStart(2, "0")
+                p.innerText = (1+i).toString().padStart(2, "0");
                 columnlabel.appendChild(p);
             }
 
             for (let j = 0; j < questions; j++) {
                 for (let i = 0; i < choices; i++) {
-                    const newcell = cell.cloneNode(true)
+                    const newcell = cell.cloneNode(true);
                     newcell.name = `question${j}`;
                     newcell.value = i;
-                    allChoices.appendChild(newcell)
+                    allChoices.appendChild(newcell);
                 }
             }
 
             gabaritoList.map(gabarito => {
+                gabarito.style.setProperty("--choices", choices);
                 removeAllChildren(gabarito);
                 gabarito.appendChild(rowlabel.cloneNode(true));
                 gabarito.appendChild(columnlabel.cloneNode(true));
@@ -223,8 +226,11 @@
             print()
         }
 
-        loadCells()
-        loadCells({tagName:"div", gabaritoList:[document.getElementById("test-gabarito")]})
+        const loadCellsCustomPrintable = () => {
+            loadCells();
+            loadCells({tagName:"div", gabaritoList:[document.getElementById("test-gabarito")], classes:["sm3"]});
+        }
+        loadCellsCustomPrintable();
 
         document.addEventListener('swiped-left', function (e) {
             document.getElementById("dashboard").classList.add("closed");
@@ -236,8 +242,8 @@
             loadQrcode();
             loadInfo();
         }));
-        Array.from(document.querySelectorAll("#choices, #questions")).map(el => el.addEventListener("change", loadCells))
-        Array.from(document.querySelectorAll("#choices, #questions")).map(el => el.addEventListener("click", loadCells))
+        Array.from(document.querySelectorAll("#choices, #questions")).map(el => el.addEventListener("change", loadCellsCustomPrintable))
+        Array.from(document.querySelectorAll("#choices, #questions")).map(el => el.addEventListener("click", loadCellsCustomPrintable))
     </script>
 </body>
 

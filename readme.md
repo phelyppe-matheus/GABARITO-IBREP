@@ -37,4 +37,3 @@ _JSON_
 |answers|Número errado de respostas|
 |duplicate|Mais de uma alternativa marcada|
 |unknown|Erro ainda não documentado|
-

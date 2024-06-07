@@ -56,6 +56,7 @@ def exam_review():
             if len(exam["correctAnswers"]) == questionCount:
                 reviewer.reviewAnswers(exam["correctAnswers"])
                 res["score"] = reviewer.score
+                res["marked"] = reviewer.markCorrectAnswers(exam["correctAnswers"])
             elif len(exam["correctAnswers"]) > questionCount:
                 res['err']["answers"] = "Respostas demais"
             elif len(exam["correctAnswers"]) < questionCount:

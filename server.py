@@ -56,18 +56,18 @@ def exam_review():
             if len(exam["correctAnswers"]) == questionCount:
                 reviewer.reviewAnswers(exam["correctAnswers"])
                 res["score"] = reviewer.score
-                res["marked"] = reviewer.markCorrectAnswers(exam["correctAnswers"])
+                res["marked"] = reviewer.ndarrayToJPG(reviewer.markCorrectAnswers(exam["correctAnswers"]))
             elif len(exam["correctAnswers"]) > questionCount:
                 res['err']["answers"] = "Respostas demais"
             elif len(exam["correctAnswers"]) < questionCount:
                 res['err']["answers"] = "Respostas insuficientes"
         res['err'].update(reviewer.err)
-    # except TypeError:
-    #     res['err']["tipo"] = "Check the types of what you've sent."
+    except TypeError:
+        res['err']["tipo"] = "Check the types of what you've sent."
     except ValueError as e:
         res['err']["wrongValue"] = str(e)
-    # except Exception as e:
-    #     res['err']["unknown"] =str(e)
+    except Exception as e:
+        res['err']["unknown"] =str(e)
     return jsonify(res)
 
 

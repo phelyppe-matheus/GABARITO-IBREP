@@ -80,6 +80,10 @@ class AnswerSheetRecognitionModel:
 
         return imgMarked
 
+    def ndarrayToJPG(self, img):
+        _, buffer = cv2.imencode(".jpg", img)
+        return base64.b64encode(buffer).decode("utf-8")
+
     def preProcessing(self, img, imgShape=(0,0)):
         if imgShape == (0,0):
             imgShape = (self.imgWidth, self.imgWidth)
@@ -175,7 +179,7 @@ class AnswerSheetRecognitionModel:
         correct = 0
         for i in range(len(self.studentsAnswers)):
             correct += correctAnswers[i] == chr(65+self.studentsAnswers[i])
-        self.score = correct/self.questionCount
+        self.score = (correct/self.questionCount) * 10
 
 
 if __name__ == '__main__':

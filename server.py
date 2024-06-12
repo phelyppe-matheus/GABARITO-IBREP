@@ -11,6 +11,7 @@ from ORMGabarito import AnswerSheetRecognitionModel
 
 app = Flask(__name__, template_folder="templates")
 key = os.environ.get("ANSWER_KEY")
+ibrep_url = os.environ.get("IBREP_URL", "https://ibrep.alfamaoraculo.com.br/api/set/score")
 fernet = Fernet(key)
 
 @app.route("/", methods=["GET"])
@@ -73,7 +74,7 @@ def exam_review():
 
 @app.route("/exam/capture", methods=["GET"])
 def exam_capture():
-    return render_template('capture.html')
+    return render_template('capture.html', conf={"ibrep_url": ibrep_url})
 
 
 @app.route("/exam/makeqrcode", methods=["GET"])

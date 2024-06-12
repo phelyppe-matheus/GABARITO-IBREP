@@ -63,20 +63,29 @@ class AnswerSheetRecognitionModel:
             raise Exception("missing image")
 
     def markCorrectAnswers(self, correctAnswers):
-        imgMarked = cv2.cvtColor(self.imgWarp, cv2.COLOR_GRAY2RGB)
+        imgShaped = np.zeros(self.imgWarp.shape, dtype = "uint8")
+        img = cv2.cvtColor(cv2.cvtColor(self.img, cv2.COLOR_RGB2GRAY), cv2.COLOR_GRAY2BGR)
+        imgStRight = imgShaped.copy()
+        imgStWrong = imgShaped.copy()
+        imgCorrect = imgShaped.copy()
 
         for i in range(self.questionCount):
             y = i*self.bs
-            xc = (ord(correctAnswers[i])-65)*self.choiceWidth
-            xs = self.studentsAnswers[i]*self.choiceWidth
-            h = self.choiceWidth
-            w = self.choiceWidth
+            xcorrect = (ord(correctAnswers[i])-65)*self.choiceWidth
+            xstudent = self.studentsAnswers[i]*self.choiceWidth
+            height = self.choiceWidth
+            width = self.choiceWidth
 
-            if xc == xs:
-                imgMarked = cv2.circle(imgMarked, (xc+w//2, y+h//2), 30, (0, 255, 0), -1)
-            if xc != xs:
-                imgMarked = cv2.circle(imgMarked, (xs+w//2, y+h//2), 30, (0, 0, 255), -1)
-                imgMarked = cv2.circle(imgMarked, (xc+w//2, y+h//2), 30, (255, 0, 0), -1)
+            if xcorrect == xstudent:
+                imgStRight = cv2.circle(imgStRight, (xcorrect+width//2, y+height//2), 30, (255), -1)
+            if xcorrect != xstudent:
+                imgStWrong = cv2.circle(imgStWrong, (xcorrect+width//2, y+height//2), 30, (255), -1)
+                imgCorrect = cv2.circle(imgCorrect, (xstudent+width//2, y+height//2), 30, (255), -1)
+
+        imgPoints = cv2.merge((imgStWrong, imgStRight, imgCorrect))
+        perspective = cv2.getPerspectiveTransform(self.warpAnswerPoints, self.shapeAnswerPoints)
+        imgPointsOriginalPerspective = cv2.warpPerspective(imgPoints, perspective, (img.shape[1], img.shape[0]))
+        imgMarked = cv2.add(img, imgPointsOriginalPerspective, (None))
 
         return imgMarked
 
@@ -139,26 +148,29 @@ class AnswerSheetRecognitionModel:
         imgGraySized = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         self.imgHeight = int(self.imgWidth*(self.questionCount / self.choiceCount))
 
-        pt1 = np.float32(answersSized)
-        pt2 = np.float32([[0,0], [self.imgWidth, 0], [0, self.imgHeight], [self.imgWidth, self.imgHeight]])
+        self.shapeAnswerPoints = np.float32(answersSized)
+        self.warpAnswerPoints = np.float32([[0,0], [self.imgWidth, 0], [0, self.imgHeight], [self.imgWidth, self.imgHeight]])
 
-        warp = cv2.getPerspectiveTransform(pt1, pt2)
+        warp = cv2.getPerspectiveTransform(self.shapeAnswerPoints, self.warpAnswerPoints)
         self.imgWarp = cv2.warpPerspective(imgGraySized, warp, (self.imgWidth, self.imgHeight))
         bs = int(self.imgWarp.shape[0]/self.questionCount)
         self.bs=bs
 
         return self.imgWarp
 
-    def getChoice(self, c, r):
-        return self.imgWarp[self.bs*c:self.bs*(c+1), self.bs*r:self.bs*(r+1)]
+    def getChoice(self, column, row):
+        return self.imgWarp[self.bs*column:self.bs*(column+1), self.bs*row:self.bs*(row+1)]
+
+    def getGivenOrCalculateKernel(self):
+        return self.kernelSize if hasattr(self, "kernelSize") else 0.3*((self.bs-1)*0.5 - 1) + 0.8
 
     def getAnswers(self):
         self.answersProb = np.zeros((self.questionCount, self.choiceCount))
 
-        kernelSize = self.kernelSize if hasattr(self, "kernelSize") else 0.3*((self.bs-1)*0.5 - 1) + 0.8
+        kernelSize = self.getGivenOrCalculateKernel()
 
-        answerKernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(kernelSize), int(kernelSize)))
-        answerKernel = np.pad(answerKernel,(math.floor((self.choiceWidth-kernelSize)/2), math.ceil((self.choiceWidth-kernelSize)/2)))
+        roundMiddle = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(kernelSize), int(kernelSize)))
+        answerKernel = np.pad(roundMiddle,(math.floor((self.choiceWidth-kernelSize)/2), math.ceil((self.choiceWidth-kernelSize)/2)))
         answerKernel = answerKernel / answerKernel.sum()
 
         for i in range(self.questionCount):
@@ -183,32 +195,32 @@ class AnswerSheetRecognitionModel:
 
 
 if __name__ == '__main__':
-
     tests = {
-        "test_01": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_02": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_03": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_04": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_05": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_06": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_07": ['D','C','D','C','D','C','B','D','E','C','B','A','?','D','E','C','B','A','D'],
-        "test_08": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_09": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
-        "test_10": ['C','?','C','?','C','D','?','B','D','B','C','D','C','?','E','C','B','A','C'],
-        "test_11": ['E','?','?','?','C','?','D','C','E','C','D','E','?','?','?','?','?','?','?'],
-        "test_12": ['C','?','C','?','C','D','?','B','D','B','C','D','C','?','E','C','B','A','C'],
-        "test_13": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
-        "test_14": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
-        "test_15": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
-        "test_16": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D'],
+        # "test_01.jpg": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
+        # "test_02.jpg": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
+        # "test_03.jpg": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
+        # "test_04.jpg": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
+        # "test_05.jpg": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
+        # "test_06.jpg": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
+        # "test_07.jpg": ['D','C','D','C','D','C','B','D','E','C','B','A','?','D','E','C','B','A','D'],
+        # "test_08.jpg": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
+        # "test_09.jpg": ['?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?'],
+        # "test_10.jpg": ['C','?','C','?','C','D','?','B','D','B','C','D','C','?','E','C','B','A','C'],
+        # "test_11.jpg": ['E','?','?','?','C','?','D','C','E','C','D','E','?','?','?','?','?','?','?'],
+        # "test_12.jpg": ['C','?','C','?','C','D','?','B','D','B','C','D','C','?','E','C','B','A','C'],
+        # "test_13.jpg": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
+        # "test_14.jpg": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
+        # "test_15.jpg": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
+        # "test_16.jpg": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D'],
+        "test_18.png": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D','B'],
     }
     choices = []
 
     for t in tests:
-        try:
-            impath = f"test/{t}.jpg"
+        # try:
+            impath = f"test/{t}"
             asrm = AnswerSheetRecognitionModel()
-            asrm.setUp(19, 5,  impath)
+            asrm.setUp(len(tests[t]), 5,  impath)
             asrm.recognise()
             imgMarked = asrm.markCorrectAnswers(tests[f"{t}"])
 
@@ -217,12 +229,12 @@ if __name__ == '__main__':
             answerKernel = np.pad(answerKernel,(math.floor((asrm.choiceWidth-kernelSize)/2), math.ceil((asrm.choiceWidth-kernelSize)/2)))
             normalKernel = (answerKernel[::]).astype(np.uint8)
             inverseKernel = (answerKernel == 0).astype(np.uint8)
+            print(asrm.studentsAnswers)
 
-            for i, a in enumerate(asrm.studentsAnswers):
-                print()
-                if a > -1:
-                    choice = asrm.getChoice(i, a)
+            cv2.imshow("img", cv2.resize(asrm.img, (0,0), fx=0.35, fy=0.35))
+            cv2.imshow("imgMarked", cv2.resize(imgMarked, (0,0), fx=0.35, fy=0.35))
+            cv2.waitKey()
+            cv2.destroyAllWindows()
 
-                    choices.append(choice)
-        except Exception as e:
-            print(e)
+        # except Exception as e:
+        #     print(t, ":",e)

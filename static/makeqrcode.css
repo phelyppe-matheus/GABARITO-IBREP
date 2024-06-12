@@ -327,6 +327,12 @@ input[type=number] {
     text-align: center;
 }
 
+.test .rules {
+    text-align: justify;
+    text-justify: inter-word;
+    text-wrap: pretty;
+}
+
 .test .test-info .outro {
     text-align: right;
 }

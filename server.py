@@ -5,14 +5,17 @@ from cryptography.fernet import Fernet
 import os
 import ast
 import json
-import utils
 
+
+import utils
+from languages import strings
 from ORMGabarito import AnswerSheetRecognitionModel
 
 app = Flask(__name__, template_folder="templates")
 key = os.environ.get("ANSWER_KEY")
 ibrep_url = os.environ.get("IBREP_URL", "https://ibrep.alfamaoraculo.com.br/api/set/score")
 fernet = Fernet(key)
+supported_languages = ["en", "pt"]
 
 @app.route("/", methods=["GET"])
 def goto_capture():
@@ -74,12 +77,17 @@ def exam_review():
 
 @app.route("/exam/capture", methods=["GET"])
 def exam_capture():
-    return render_template('capture.html', conf={"ibrep_url": ibrep_url})
+    conf = {"ibrep_url": ibrep_url}
+    return render_template('capture.html', conf=conf)
 
 
 @app.route("/exam/makeqrcode", methods=["GET"])
 def make_qr_code():
-    return render_template('makeqrcode.html')
+    lang = request.accept_languages.best_match(supported_languages)
+    conf = {
+        "strings": strings[lang]
+    }
+    return render_template('makeqrcode.html', conf=conf)
 
 
 @app.route("/encrypt", methods=["POST"])

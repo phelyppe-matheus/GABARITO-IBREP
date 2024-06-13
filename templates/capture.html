@@ -124,8 +124,7 @@
         }
 
         async function sendToIbrep() {
-            // const url = "https://ibrep.alfamaoraculo.com.br/api/set/score";
-            const url = "http://localhost.ibrep.com.br/api/set/score";
+            const url = "{{conf['ibrep_url']}}/api/set/score";
 
             idmatricula = await askIdMatricula()
 

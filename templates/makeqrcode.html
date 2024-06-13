@@ -33,22 +33,22 @@
             <div class="studentdata professor">Professor(a)</div>
         </div>
         <div id="qrcode" src="" alt="qrcode da prova" class="qrcode"></div>
-        <div class="test-info">
-            <h2 class="title-center">Informações Importantes</h2>
-            <ol>
-                <li class="rules">Durante a realização da avaliação não é permitido a utilização de fones de ouvido e
-                    aparelhos eletrônicos(celulares, tablets, computadores e etc.);</li>
-                <li class="rules">A avaliação é individual e sem consulta;</li>
-                <li class="rules">Não é permitido a reprodução das Informações contidas na avaliação, seja por
-                    transcrição, ou registro fotográfico;</li>
-                <li class="rules">São válidos apenas as respostas preenchidas no gabarito;</li>
-                <li class="rules">Utilize caneta estereografica azul ou preta;</li>
-                <li class="rules">Fique atento(a) ao preenchimento do gabarito. Marque as respostas no campo
-                    correspondente a cada item. Em caso de rasura a questão será anulada;</li>
-            </ol>
-            <h3 class="outro">Boa prova</h3>
-        </div>
         <div class="test-body">
+            <div class="test-info">
+                <h2 class="title-center">Informações Importantes</h2>
+                <ol>
+                    <li class="rules">Durante a realização da avaliação não é permitido a utilização de fones de ouvido e
+                        aparelhos eletrônicos(celulares, tablets, computadores e etc.);</li>
+                    <li class="rules">A avaliação é individual e sem consulta;</li>
+                    <li class="rules">Não é permitido a reprodução das Informações contidas na avaliação, seja por
+                        transcrição, ou registro fotográfico;</li>
+                    <li class="rules">São válidos apenas as respostas preenchidas no gabarito;</li>
+                    <li class="rules">Utilize caneta estereografica azul ou preta;</li>
+                    <li class="rules">Fique atento(a) ao preenchimento do gabarito. Marque as respostas no campo
+                        correspondente a cada item. Em caso de rasura a questão será anulada;</li>
+                </ol>
+                <h3 class="outro">Boa prova</h3>
+            </div>
             <div class="gabarito printable" id="test-gabarito">
             </div>
         </div>
@@ -75,10 +75,18 @@
     </div>
     <button class="control print" onclick="printTest(this)"><i class="fa fa-print"></i></button>
     <script>
+        var doc_title = document.title;
+
         function removeAllChildren(el) {
             while (el.firstChild) {
                 el.removeChild(el.lastChild);
             }
+        }
+
+        function toKebabCase(str) {
+            return str.replace(/([a-z])([A-Z])/g, "$1-$2")
+            .replace(/[\s_]+/g, '-')
+            .toLowerCase();
         }
 
         function loadCells({
@@ -222,8 +230,14 @@
 
         function printTest(el) {
             templateName = document.getElementById('name_template').value;
-            document.getElementById("customtitle").innerHTML = templateName? `<span>Prova</span> ${templateName}`: " ";
+
+            document.title = templateName? toKebabCase(templateName): `{{conf['strings']["test_title"]}}`;
+            document.getElementById("customtitle").innerHTML = templateName? `<span>{{conf['strings']["test"]}}</span> ${templateName}`: " ";
             print()
+        }
+
+        window.onafterprint = () => {
+            document.title = doc_title;
         }
 
         const loadCellsCustomPrintable = () => {

@@ -1,5 +1,5 @@
 strings = {
-    "br": {
+    "pt": {
         "test": "Prova",
         "test_title": "Nova_Prova",
     },

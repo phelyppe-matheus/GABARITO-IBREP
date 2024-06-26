@@ -91,7 +91,7 @@ class AnswerSheetRecognitionModel:
 
     def ndarrayToJPG(self, img):
         _, buffer = cv2.imencode(".jpg", img)
-        return base64.b64encode(buffer).decode("utf-8")
+        return 'data:image/jpeg;base64,'+base64.b64encode(buffer).decode("utf-8")
 
     def preProcessing(self, img, imgShape=(0,0)):
         if imgShape == (0,0):

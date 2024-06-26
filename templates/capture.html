@@ -153,7 +153,7 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (!("err" in data)) {
+                if (!("err" in data) || Object.entries(!data["err"]).length === 0) {
                     Swal.fire({
                         html: `<div>Aluno: ${data["aluno"][0]["aluno"]}</div><div>\nNota: ${data['nota']}</div>`,
                         icon: 'success'

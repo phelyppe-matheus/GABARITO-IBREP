@@ -15,7 +15,7 @@
     <div class="container">
         <div class="exam-pic-camera">
             <div class="video-container">
-                <video id="webCam"  muted autoplay playsinline></video>
+                <video id="webCam" ondrop="loadImageForm(event)" muted autoplay playsinline></video>
             </div>
             <div class="float-canva canva-container">
                 <canvas id="canvas"></canvas>
@@ -53,6 +53,30 @@
             .catch((err) => {
                 console.error(`An error occurred: ${err}`);
             });
+
+        async function loadImageForm(ev) {
+            snap();
+            
+            let file = ev.dataTransfer.files[0];
+            let img = new Image();
+            img.onload = () => {
+                canvasToSend.height = img.height;
+                canvasToSend.width = img.width;
+                canvasToSend.getContext("2d").drawImage(img, 0, 0);
+                webCamElement.parentElement.style.zIndex = "-1";
+            }
+            img.src = URL.createObjectURL(file);
+
+            ev.preventDefault();
+        }
+
+        webCamElement.addEventListener("dragenter", (event) => {
+            event.preventDefault();
+        });
+
+        webCamElement.addEventListener("dragover", (event) => {
+            event.preventDefault();
+        });
 
         function snap() {
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/webcam-easy@1.1.1/dist/webcam-easy.min.js"></script>
+    <!-- <script src="https://unpkg.com/webcam-easy@1.1.1/dist/webcam-easy.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" type="image/svg" href="{{url_for('static', filename='favicon.svg')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -15,7 +15,7 @@
     <div class="container">
         <div class="exam-pic-camera">
             <div class="video-container">
-                <video id="webCam" autoplay playsinline></video>
+                <video id="webCam"  muted autoplay playsinline></video>
             </div>
             <div class="float-canva canva-container">
                 <canvas id="canvas"></canvas>
@@ -26,7 +26,7 @@
             <button id="snap" onclick="snap(); return true;" class="cam-opt" download><i class="fa fa-camera"></i></button>
             <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
             <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
-            <button id="flip" onclick="webcam.flip();webcam.start();return true;" class="cam-opt"><i class="fa fa-rotate-right"></i></button>
+            <!-- <button id="flip" onclick="webcam.flip();webcam.start();return true;" class="cam-opt"><i class="fa fa-rotate-right"></i></button> -->
             <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button>
         </div>
     </div>
@@ -34,7 +34,6 @@
         const webCamElement = document.getElementById("webCam");
         const canvasElement = document.getElementById("canvas");
         const canvasToSend = document.getElementById("canvas-to-send");
-        const webcam = new Webcam(webCamElement, "user", canvasElement);
 
         var gabaritoData;
         var errors;
@@ -43,23 +42,25 @@
 
         var imgBuffer;
 
-        webcam.start()
-            .catch((e) => {
-                console.log(e.constraint);
+        navigator.mediaDevices
+            .getUserMedia({ video: {facingMode: "environment" }, audio: false })
+            .then((stream) => {
+                webCamElement.srcObject = stream;
+                webCamElement.play();
+            })
+            .catch((err) => {
+                console.error(`An error occurred: ${err}`);
             });
 
         function snap() {
 
-            imgBuffer = webcam.snap();
-            const image = document.createElement("img");
-            image.src=imgBuffer;
+            const clientBounds = webCamElement.getBoundingClientRect();
 
-            image.onload = () => {
-                canvasToSend.height = image.height;
-                canvasToSend.width = image.width;
-                canvasToSend.getContext("2d").drawImage(image, 0, 0);
-                webCamElement.parentElement.style.zIndex = "-1";
-            }
+
+            canvasToSend.height = clientBounds.height;
+            canvasToSend.width = clientBounds.width;
+            canvasToSend.getContext("2d").drawImage(webCamElement, 0, 0);
+            webCamElement.parentElement.style.zIndex = "-1";
         }
 
         function retry() {

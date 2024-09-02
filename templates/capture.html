@@ -35,6 +35,7 @@
         const canvasElement = document.getElementById("canvas");
         const canvasToSend = document.getElementById("canvas-to-send");
 
+        var webCamStream;
         var gabaritoData;
         var errors;
         var questionCount;
@@ -47,6 +48,7 @@
             .then((stream) => {
                 webCamElement.srcObject = stream;
                 webCamElement.play();
+                webCamStream = stream;
             })
             .catch((err) => {
                 console.error(`An error occurred: ${err}`);
@@ -54,11 +56,11 @@
 
         function snap() {
 
-            const clientBounds = webCamElement.getBoundingClientRect();
+            const streamSettings = webCamStream.getVideoTracks()[0].getSettings();
 
 
-            canvasToSend.height = clientBounds.height;
-            canvasToSend.width = clientBounds.width;
+            canvasToSend.height = streamSettings.height;
+            canvasToSend.width = streamSettings.width;
             canvasToSend.getContext("2d").drawImage(webCamElement, 0, 0);
             webCamElement.parentElement.style.zIndex = "-1";
         }

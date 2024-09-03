@@ -71,7 +71,7 @@ def exam_review():
     except ValueError as e:
         res['err']["wrongValue"] = str(e)
     except Exception as e:
-        res['err']["unknown"] =str(e)
+        res['err']["unknown"] = str(e)
     return jsonify(res)
 
 

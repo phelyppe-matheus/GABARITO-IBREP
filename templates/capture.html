@@ -40,6 +40,7 @@
         var errors;
         var questionCount;
         var choicesCount;
+        var id_solicitacao_prova;
 
         var imgBuffer;
 
@@ -54,20 +55,24 @@
                 console.error(`An error occurred: ${err}`);
             });
 
-        async function loadImageForm(ev) {
+        async function loadImageForm(e) {
+            e.preventDefault();
             snap();
-            
-            let file = ev.dataTransfer.files[0];
+
+            let file = e.dataTransfer.files[0];
+            let fileReader = new FileReader();
             let img = new Image();
+
             img.onload = () => {
                 canvasToSend.height = img.height;
                 canvasToSend.width = img.width;
                 canvasToSend.getContext("2d").drawImage(img, 0, 0);
                 webCamElement.parentElement.style.zIndex = "-1";
+    
+                imgBuffer = canvasToSend.toDataURL();
             }
-            img.src = URL.createObjectURL(file);
 
-            ev.preventDefault();
+            img.src = URL.createObjectURL(file);
         }
 
         webCamElement.addEventListener("dragenter", (event) => {
@@ -116,21 +121,16 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (!("err" in data) || Object.entries(!data["err"]).length === 0) {
+                    if (!dataHasErr(data)) {
                         gabaritoData = data
                         Swal.fire({
                             text: "Dados de gabarito e QR salvos",
                             icon: "success"
                         });
                         return;
+                    } else {
+                        handleApiError(data)
                     }
-                    errors = data["err"];
-
-                    errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-                    Swal.fire({
-                        text: errStr,
-                        icon: "error"
-                    });
                 })
                 .catch(err => console.log(err))
                 .finally(() => {
@@ -148,6 +148,56 @@
                 }
             })
                 .then(data => data.value)
+        }
+
+        function dataHasErr(data) {
+            if (!("err" in data)) return false
+            if (Object.entries(data["err"]).length === 0) return false
+            return true
+        }
+
+        function makeTextExamButtons(test) {
+            return `<button 
+                onclick='id_solicitacao_prova=${test["id_solicitacao_prova"]}'>
+                De ${test['de']} até ${test['ate']}
+            </button>`;
+        }
+
+        function handleIbrepApiFollowUp(followUpData) {
+            html = "<h1>Selecione a prova desejada</h1>";
+
+            followUpData['follow_up'].forEach(test => {
+                html += makeTextExamButtons(test);
+            });
+
+            Swal.fire({
+                html: html,
+                icon: 'info'
+            })
+                .then((result) => {
+                    sendToIbrep()
+                        .then(() => {
+                            id_solicitacao_prova = undefined;
+                        });
+                });
+        }
+
+        function handleIbrepApiAnswer(answer) {
+            Swal.fire({
+                html: `<div>Aluno: ${answer["aluno"][0]["aluno"]}</div><div>\nNota: ${answer['nota']}</div>`,
+                icon: 'success'
+            });
+            gabaritoData = {}
+        }
+
+        function handleApiError(data) {
+            errors = data["err"];
+
+            errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
+            Swal.fire({
+                text: errStr,
+                icon: "error"
+            });
         }
 
         async function sendToIbrep() {
@@ -170,6 +220,7 @@
                 idmodelo,
                 protocolo,
                 marked,
+                id_solicitacao_prova
             }
 
             document.body.classList.add("loading")
@@ -180,21 +231,13 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (!("err" in data) || Object.entries(!data["err"]).length === 0) {
-                    Swal.fire({
-                        html: `<div>Aluno: ${data["aluno"][0]["aluno"]}</div><div>\nNota: ${data['nota']}</div>`,
-                        icon: 'success'
-                    });
-                    gabaritoData = {}
-                    return;
+                if ('follow_up' in data) {
+                    handleIbrepApiFollowUp(data);
+                } else if (!dataHasErr(data)) {
+                    handleIbrepApiAnswer(data);
+                } else {
+                    handleApiError(data);
                 }
-                errors = data["err"]
-
-                errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-                Swal.fire({
-                    text: errStr,
-                    icon: 'error'
-                });
             })
             .catch(err => Swal.fire({
                 text: err,

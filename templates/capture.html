@@ -92,6 +92,8 @@
             canvasToSend.width = streamSettings.width;
             canvasToSend.getContext("2d").drawImage(webCamElement, 0, 0);
             webCamElement.parentElement.style.zIndex = "-1";
+
+            imgBuffer = canvasToSend.toDataURL();
         }
 
         function retry() {

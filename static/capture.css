@@ -107,3 +107,7 @@ button {
     grid-area: 3/1/4/2;
     color: black;
 }
+
+.exam-pic-camera #canvas-to-send {
+    max-height: 100vh;
+}

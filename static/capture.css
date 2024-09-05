@@ -68,9 +68,8 @@ button {
 .exam-pic-camera .cam-opt {
     z-index: 10;
     height: 80%;
-    aspect-ratio: 1;
-
-    border-radius: 50%;
+    justify-self: stretch;
+    border-radius: 5px;
     color: hsl(0, 72%, 100%);
 }
 

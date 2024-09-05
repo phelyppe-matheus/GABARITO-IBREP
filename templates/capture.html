@@ -55,6 +55,14 @@
                 console.error(`An error occurred: ${err}`);
             });
 
+        webCamElement.addEventListener("dragenter", (event) => {
+            event.preventDefault();
+        });
+
+        webCamElement.addEventListener("dragover", (event) => {
+            event.preventDefault();
+        });
+
         async function loadImageForm(e) {
             e.preventDefault();
             snap();
@@ -75,14 +83,6 @@
             img.src = URL.createObjectURL(file);
         }
 
-        webCamElement.addEventListener("dragenter", (event) => {
-            event.preventDefault();
-        });
-
-        webCamElement.addEventListener("dragover", (event) => {
-            event.preventDefault();
-        });
-
         function snap() {
 
             const streamSettings = webCamStream.getVideoTracks()[0].getSettings();
@@ -95,7 +95,8 @@
         }
 
         function retry() {
-            canvasToSend.getContext("2d").clearRect(0, 0, canvasToSend.width, canvasToSend.height);
+            canvasToSend.height = 1;
+            canvasToSend.width = 1;
             webCamElement.parentElement.style.position = "relative";
             webCamElement.parentElement.style.zIndex = "0";
         }
@@ -232,6 +233,8 @@
             .then(res => res.json())
             .then(data => {
                 if ('follow_up' in data) {
+                    handleApiError({"err": {"1": "Existem mais de 1 prova para esse aluno hoje. Por favor, contacte o IBREP para mais informações."}})
+                    return;
                     handleIbrepApiFollowUp(data);
                 } else if (!dataHasErr(data)) {
                     handleIbrepApiAnswer(data);

@@ -153,6 +153,7 @@
 
         function dataHasErr(data) {
             if (!("err" in data)) return false
+            if (!(data["err"])) return false
             if (Object.entries(data["err"]).length === 0) return false
             return true
         }
@@ -242,10 +243,10 @@
                     handleApiError(data);
                 }
             })
-            .catch(err => Swal.fire({
-                text: err,
-                icon: 'error'
-            }))
+            // .catch(err => Swal.fire({
+            //     text: err,
+            //     icon: 'error'
+            // }))
             .finally(() => {
                 document.body.classList.remove("loading")
             })

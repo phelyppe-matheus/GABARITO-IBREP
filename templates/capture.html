@@ -27,7 +27,7 @@
             <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
             <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
             <!-- <button id="flip" onclick="webcam.flip();webcam.start();return true;" class="cam-opt"><i class="fa fa-rotate-right"></i></button> -->
-            <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button>
+            <!-- <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button> -->
         </div>
     </div>
     <script>
@@ -128,6 +128,7 @@
                             text: "Dados de gabarito e QR salvos",
                             icon: "success"
                         });
+                        sendToIbrep();
                         return;
                     } else {
                         handleApiError(data)
@@ -141,12 +142,18 @@
 
         function askIdMatricula() {
             return Swal.fire({
-                title: "digite a matricula do aluno em questão",
-                html: '<input id="idmatricula" class="swal2-input">',
-                focusConfirm: false,
-                preConfirm: () => {
-                    return document.getElementById("idmatricula").value;
+                title: "Digite a matricula",
+                input: "tel",
+                inputLabel: "Digite o Idmatricula do aluno em específico",
+                inputPlaceholder: "ex.: 654321",
+                inputAttributes: {
+                    maxlength: "10",
+                    autocapitalize: "off",
+                    autocorrect: "off"
                 }
+                // preConfirm: () => {
+                //     return document.getElementById("idmatricula").value;
+                // }
             })
                 .then(data => data.value)
         }
@@ -205,7 +212,16 @@
         async function sendToIbrep() {
             const url = "{{conf['ibrep_url']}}/api/set/score";
 
-            idmatricula = await askIdMatricula()
+            while (true) {
+                idmatricula = await askIdMatricula()
+                if (idmatricula) {
+                    break;
+                }
+                await Swal.fire({
+                    text: "Necessito da matricula do aluno em questão.",
+                    icon: "error"
+                });
+            }
 
             iddisciplina = gabaritoData["iddisciplina"]
             nota = gabaritoData["score"]

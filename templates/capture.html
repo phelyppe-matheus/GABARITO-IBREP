@@ -48,7 +48,7 @@
         var imgBuffer;
 
         navigator.mediaDevices
-            .getUserMedia({ video: {facingMode: "environment" }, audio: false })
+            .getUserMedia({ video: {facingMode: "environment", resizeMode: "none" }, audio: false })
             .then((stream) => {
                 webCamElement.srcObject = stream;
                 webCamElement.play();

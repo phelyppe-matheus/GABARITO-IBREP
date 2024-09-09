@@ -34,6 +34,24 @@ button {
     border: none;
 }
 
+button.loading {
+    box-shadow: 0 0 0px 5px #00000080 inset;
+    filter: brightness(0.5);
+}
+
+/* HTML: <div class="loader"></div> */
+body.loading .loader {
+    width: 30%;
+    aspect-ratio: 4;
+    background: radial-gradient(circle closest-side, var(--ibrepblue) 90%,#0000) 0/calc(100%/3) 100% no-repeat;
+    animation: l2 1s steps(3) infinite;
+}
+@keyframes l2 {to{background-position: 150%}}
+
+body.loading .exam-pic-camera .exam-overlay {
+    display: none;
+}
+
 .container {
     height: 100vh;
     width: 100vw;
@@ -60,7 +78,7 @@ button {
     scale: 1.05;
 }
 
-.exam-pic-camera .video-container, .exam-pic-camera .canva-container, .exam-pic-camera .final-output, .exam-pic-camera .exam-overlay {
+.exam-pic-camera .video-container, .exam-pic-camera .canva-container, .exam-pic-camera .final-output, .exam-pic-camera .exam-overlay, .exam-pic-camera .loader {
     grid-area: 1/1/4/5;
 }
 

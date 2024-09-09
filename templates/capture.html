@@ -31,6 +31,7 @@
             <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
             <button id="flip" onclick="videoTrack.applyConstraints({advanced:[{torch:true}]});return true;" class="cam-opt"><i class="fa fa-flash"></i></button>
             <!-- <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button> -->
+            <div class="loader"></div>
         </div>
     </div>
     <script>
@@ -133,6 +134,7 @@
             }
 
             document.body.classList.add("loading")
+            document.getElementById("send").classList.add("loading")
 
             fetch(url, {
                 method: 'POST',
@@ -159,6 +161,7 @@
                 .catch(err => console.log(err))
                 .finally(() => {
                     document.body.classList.remove("loading")
+                    document.getElementById("send").classList.remove("loading")
                 })
         }
 

@@ -56,7 +56,11 @@ button {
     z-index: -1;
 }
 
-.exam-pic-camera .video-container, .exam-pic-camera .canva-container, .exam-pic-camera .final-output {
+.exam-pic-camera .exam-overlay {
+    scale: 1.05;
+}
+
+.exam-pic-camera .video-container, .exam-pic-camera .canva-container, .exam-pic-camera .final-output, .exam-pic-camera .exam-overlay {
     grid-area: 1/1/4/5;
 }
 

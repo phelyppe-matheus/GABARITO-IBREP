@@ -23,10 +23,13 @@
             <div class="float-canva final-output">
                 <canvas id="canvas-to-send"></canvas>
             </div>
+            <div class="float-canva exam-overlay">
+                <img src="/static/overlay/examLayoutOverlay.svg" alt="" id="exam-overlay" style="display: none;">
+            </div>
             <button id="snap" onclick="snap(); return true;" class="cam-opt" download><i class="fa fa-camera"></i></button>
             <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
             <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
-            <!-- <button id="flip" onclick="webcam.flip();webcam.start();return true;" class="cam-opt"><i class="fa fa-rotate-right"></i></button> -->
+            <button id="flip" onclick="videoTrack.applyConstraints({advanced:[{torch:true}]});return true;" class="cam-opt"><i class="fa fa-flash"></i></button>
             <!-- <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button> -->
         </div>
     </div>
@@ -50,6 +53,7 @@
                 webCamElement.srcObject = stream;
                 webCamElement.play();
                 webCamStream = stream;
+                setUpExamOverlay(stream.getVideoTracks()[0].getSettings());
             })
             .catch((err) => {
                 console.error(`An error occurred: ${err}`);
@@ -62,6 +66,14 @@
         webCamElement.addEventListener("dragover", (event) => {
             event.preventDefault();
         });
+
+        function setUpExamOverlay(dimensions) {
+            let overlay = document.getElementById("exam-overlay");
+
+            overlay.style.setProperty('height', `${dimensions.height}px`);
+            overlay.style.setProperty('width', `${dimensions.width}px`);
+            overlay.style.setProperty('display', "block");
+        }
 
         async function loadImageForm(e) {
             e.preventDefault();
@@ -84,16 +96,24 @@
         }
 
         function snap() {
+            const tracks = webCamStream.getVideoTracks()[0];
+            const streamSettings = tracks.getSettings();
+            let imgCapture = new ImageCapture(tracks);
 
-            const streamSettings = webCamStream.getVideoTracks()[0].getSettings();
+            imgCapture.takePhoto()
+                .then(blob => {
+                    let img = new Image();
 
-
-            canvasToSend.height = streamSettings.height;
-            canvasToSend.width = streamSettings.width;
-            canvasToSend.getContext("2d").drawImage(webCamElement, 0, 0);
-            webCamElement.parentElement.style.zIndex = "-1";
-
-            imgBuffer = canvasToSend.toDataURL();
+                    img.onload = () => {
+                                            canvasToSend.height = streamSettings.height;
+                                            canvasToSend.width = streamSettings.width;
+                                            canvasToSend.getContext("2d").drawImage(img, 0, 0);
+                                            webCamElement.parentElement.style.zIndex = "-1";
+                                            imgBuffer = canvasToSend.toDataURL();
+                    }
+                    
+                    img.src = URL.createObjectURL(blob);
+                })
         }
 
         function retry() {

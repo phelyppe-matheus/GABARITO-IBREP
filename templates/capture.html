@@ -105,11 +105,11 @@
                     let img = new Image();
 
                     img.onload = () => {
-                                            canvasToSend.height = streamSettings.height;
-                                            canvasToSend.width = streamSettings.width;
-                                            canvasToSend.getContext("2d").drawImage(img, 0, 0);
-                                            webCamElement.parentElement.style.zIndex = "-1";
-                                            imgBuffer = canvasToSend.toDataURL();
+                        canvasToSend.height = img.naturalHeight;
+                        canvasToSend.width = img.naturalWidth;
+                        canvasToSend.getContext("2d").drawImage(img, 0, 0);
+                        webCamElement.parentElement.style.zIndex = "-1";
+                        imgBuffer = canvasToSend.toDataURL();
                     }
                     
                     img.src = URL.createObjectURL(blob);

@@ -14,6 +14,7 @@
 <body>
     <div class="container">
         <div class="exam-pic-camera">
+            <button id="expand" onclick="askForFullScreen()" class="screen-opt" download><i class="fa fa-expand"></i></button>
             <div class="video-container">
                 <video id="webCam" muted autoplay playsinline></video>
             </div>
@@ -38,6 +39,7 @@
         const webCamElement = document.getElementById("webCam");
         const canvasElement = document.getElementById("canvas");
         const canvasToSend = document.getElementById("canvas-to-send");
+        const overlayElement = document.getElementById("exam-overlay")
 
         var webCamStream;
         var gabaritoData;
@@ -60,27 +62,41 @@
                 console.error(`An error occurred: ${err}`);
             });
 
-        Swal.fire({
-            title: "Permite tela cheia?",
-            text: "Com a tela cheia, você pode usar o aplicativo mais eficientemente",
-            showCancelButton: true,
-            confirmButtonText: "Permitir",
-            confirmButtonAriaLabel: "Permitir o uso do aplicativo em tela cheia",
-            cancelButtonText: "Melhor não, obrigado",
-            cancelButtonAriaLabel: "Não permitir o uso do aplicatico em tela cheia"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.body.requestFullscreen();
-            } 
-        })
+        function cancelElementDrag(el) {
+            el.addEventListener("dragenter", (event) => {
+                event.preventDefault();
+            });
 
-        document.getElementById("exam-overlay").addEventListener("dragenter", (event) => {
-            event.preventDefault();
-        });
+            el.addEventListener("dragover", (event) => {
+                event.preventDefault();
+            });
+        }
 
-        document.getElementById("exam-overlay").addEventListener("dragover", (event) => {
-            event.preventDefault();
-        });
+        cancelElementDrag(overlayElement);
+        cancelElementDrag(webCamElement);
+        cancelElementDrag(canvasElement);
+
+        webCamElement.ondrop = loadImageForm;
+        canvasElement.ondrop = loadImageForm;
+        overlayElement.ondrop = loadImageForm;
+
+        function askForFullScreen() {
+            Swal.fire({
+                title: "Permite tela cheia?",
+                text: "Com a tela cheia, você pode usar o aplicativo mais eficientemente",
+                showCancelButton: true,
+                confirmButtonText: "Permitir",
+                confirmButtonAriaLabel: "Permitir o uso do aplicativo em tela cheia",
+                cancelButtonText: "Melhor não, obrigado",
+                cancelButtonAriaLabel: "Não permitir o uso do aplicatico em tela cheia"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.body.requestFullscreen();
+                } 
+            })
+        }
+
+        askForFullScreen();
 
         function setUpExamOverlay(dimensions) {
             let overlay = document.getElementById("exam-overlay");
@@ -113,6 +129,7 @@
             const streamSettings = tracks.getSettings();
             let imgCapture = new ImageCapture(tracks);
 
+            document.getElementById("snap").classList.add("loading");
             imgCapture.takePhoto()
                 .then(blob => {
                     let img = new Image();
@@ -123,6 +140,7 @@
                         canvasToSend.getContext("2d").drawImage(img, 0, 0);
                         webCamElement.parentElement.style.zIndex = "-1";
                         imgBuffer = canvasToSend.toDataURL();
+                        document.getElementById("snap").classList.remove("loading");
                     }
                     
                     img.src = URL.createObjectURL(blob);

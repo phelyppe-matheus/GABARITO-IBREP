@@ -60,6 +60,20 @@
                 console.error(`An error occurred: ${err}`);
             });
 
+        Swal.fire({
+            title: "Permite tela cheia?",
+            text: "Com a tela cheia, você pode usar o aplicativo mais eficientemente",
+            showCancelButton: true,
+            confirmButtonText: "Permitir",
+            confirmButtonAriaLabel: "Permitir o uso do aplicativo em tela cheia",
+            cancelButtonText: "Melhor não, obrigado",
+            cancelButtonAriaLabel: "Não permitir o uso do aplicatico em tela cheia"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.body.requestFullscreen();
+            } 
+        })
+
         document.getElementById("exam-overlay").addEventListener("dragenter", (event) => {
             event.preventDefault();
         });

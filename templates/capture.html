@@ -15,7 +15,7 @@
     <div class="container">
         <div class="exam-pic-camera">
             <div class="video-container">
-                <video id="webCam" ondrop="loadImageForm(event)" muted autoplay playsinline></video>
+                <video id="webCam" muted autoplay playsinline></video>
             </div>
             <div class="float-canva canva-container">
                 <canvas id="canvas"></canvas>
@@ -24,14 +24,14 @@
                 <canvas id="canvas-to-send"></canvas>
             </div>
             <div class="float-canva exam-overlay">
-                <img src="/static/overlay/examLayoutOverlay.svg" alt="" id="exam-overlay" style="display: none;">
+                <img src="/static/overlay/examLayoutOverlay.svg" alt="" id="exam-overlay" ondrop="loadImageForm(event)" style="display: none;">
             </div>
+            <div class="loader"></div>
             <button id="snap" onclick="snap(); return true;" class="cam-opt" download><i class="fa fa-camera"></i></button>
             <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
             <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
             <button id="flip" onclick="videoTrack.applyConstraints({advanced:[{torch:true}]});return true;" class="cam-opt"><i class="fa fa-flash"></i></button>
             <!-- <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button> -->
-            <div class="loader"></div>
         </div>
     </div>
     <script>
@@ -60,11 +60,11 @@
                 console.error(`An error occurred: ${err}`);
             });
 
-        webCamElement.addEventListener("dragenter", (event) => {
+        document.getElementById("exam-overlay").addEventListener("dragenter", (event) => {
             event.preventDefault();
         });
 
-        webCamElement.addEventListener("dragover", (event) => {
+        document.getElementById("exam-overlay").addEventListener("dragover", (event) => {
             event.preventDefault();
         });
 
@@ -78,10 +78,8 @@
 
         async function loadImageForm(e) {
             e.preventDefault();
-            snap();
 
             let file = e.dataTransfer.files[0];
-            let fileReader = new FileReader();
             let img = new Image();
 
             img.onload = () => {

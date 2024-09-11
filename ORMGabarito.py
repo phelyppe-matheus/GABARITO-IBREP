@@ -27,7 +27,7 @@ class AnswerSheetRecognitionModel:
     
     def getQrCodeData(self, path = None, base64=None, buffer=None):
         self.loadimg(path, base64, buffer)
-        return qreader.detect_and_decode(self.img)
+        return qreader.detect_and_decode(self.img, True)
 
     def setUp(self, questionCount, choiceCount, path = None, base64=None, buffer=None):
         self.questionCount = questionCount
@@ -102,6 +102,16 @@ class AnswerSheetRecognitionModel:
         if self.choiceCount >= self.questionCount :imgBlur = cv2.GaussianBlur(imgGray, (5,5), 1)
         else: imgBlur = cv2.GaussianBlur(imgGray, (3,3), 1)
         imgCanny = cv2.Canny(imgBlur,10,50)
+        if hasattr(self, 'defuse') and self.defuse:
+            sX = self.imgWidth/img.shape[1]
+            sY = self.imgWidth/img.shape[0]
+
+            self.defuse[0] = int(self.defuse[0] * sX)
+            self.defuse[1] = int(self.defuse[1] * sY)
+            self.defuse[2] = int(self.defuse[2] * sX)
+            self.defuse[3] = int(self.defuse[3] * sY)
+
+            imgCanny = cv2.rectangle(imgCanny, (self.defuse[0],self.defuse[1]), (self.defuse[2], self.defuse[3]), 0, -1)
 
         return imgResized, imgGray, imgBlur, imgCanny
 
@@ -212,7 +222,8 @@ if __name__ == '__main__':
         # "test_14.jpg": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
         # "test_15.jpg": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
         # "test_16.jpg": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D'],
-        "test_18.png": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D','B'],
+        # "test_18.png": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D','B'],
+        "test_20.jpeg": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D','B'],
     }
     choices = []
 
@@ -221,6 +232,8 @@ if __name__ == '__main__':
             impath = f"test/{t}"
             asrm = AnswerSheetRecognitionModel()
             asrm.setUp(len(tests[t]), 5,  impath)
+            asrm.defuse = [0, 0, asrm.img.shape[1], asrm.getQrCodeData()[1][0]['bbox_xyxy'][1]]
+            print(asrm.getQrCodeData()[1][0]['bbox_xyxy'])
             asrm.recognise()
             imgMarked = asrm.markCorrectAnswers(tests[f"{t}"])
 

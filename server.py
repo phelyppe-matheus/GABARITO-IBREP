@@ -29,7 +29,7 @@ def exam_review():
         reviewer = AnswerSheetRecognitionModel()
         exam = request.json
         qrcodeData = reviewer.getQrCodeData(base64=exam["examPhoto"])
-        if not len(qrcodeData):
+        if not len(qrcodeData[0]):
             raise Exception("Não foi possível identificar o qr code")
         else:
             qrcodeTop = qrcodeData[1][0]['bbox_xyxy'][1]
@@ -68,8 +68,6 @@ def exam_review():
             elif len(exam["correctAnswers"]) < questionCount:
                 res['err']["answers"] = "Respostas insuficientes"
         res['err'].update(reviewer.err)
-    except TypeError:
-        res['err']["tipo"] = "Check the types of what you've sent."
     except ValueError as e:
         res['err']["wrongValue"] = str(e)
     except Exception as e:

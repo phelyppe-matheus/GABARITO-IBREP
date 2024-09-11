@@ -63,7 +63,7 @@ button {
     border: none;
 }
 button.loading {
-    box-shadow: 0 0 0px 5px #00000080 inset;
+    --font-opacity: 30%;
     filter: brightness(0.5);
 }
 
@@ -91,6 +91,8 @@ body.loading .exam-pic-camera .exam-overlay {
 }
 
 .exam-pic-camera {
+    --font-opacity: 100%;
+
     display: grid;
     grid-template-columns: 0.5rem repeat(4, 1fr) 0.5rem;
     grid-template-rows: 4rem auto 4rem;
@@ -115,6 +117,7 @@ body.loading .exam-pic-camera .exam-overlay {
 .cam-opt {
     grid-row: 3/4;
     border-radius: 25%;
+    color: hsla(0, 0%, 100%, var(--font-opacity));
 }
 
 .exam-pic-camera #snap {
@@ -136,4 +139,13 @@ body.loading .exam-pic-camera .exam-overlay {
 
 .exam-pic-camera #retry {
     color: black;
+}
+
+
+.exam-pic-camera #expand {
+    grid-area: 1/5/2/6;
+    color: white;
+    background-color: #0000;
+    aspect-ratio: 1;
+    justify-self: end;
 }

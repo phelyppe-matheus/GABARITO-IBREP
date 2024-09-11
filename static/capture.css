@@ -71,8 +71,10 @@ button.loading {
 body.loading .loader {
     width: 30%;
     aspect-ratio: 4;
-    background: radial-gradient(circle closest-side, var(--ibrepblue) 90%,#0000) 0/calc(100%/3) 100% no-repeat;
+    background: radial-gradient(circle closest-side, black 90%,#0000) 0/calc(100%/3) 100% no-repeat;
     animation: l2 1s steps(3) infinite;
+    align-self: center;
+    justify-self: center;
 }
 @keyframes l2 {to{background-position: 150%}}
 

@@ -30,9 +30,10 @@ def exam_review():
         exam = request.json
         qrcodeData = reviewer.getQrCodeData(base64=exam["examPhoto"])
         if not len(qrcodeData):
-            raise ValueError("Não foi possível identificar o qr code")
+            raise Exception("Não foi possível identificar o qr code")
         else:
-            qrcodeData = qrcodeData[0]
+            qrcodeTop = qrcodeData[1][0]['bbox_xyxy'][1]
+            qrcodeData = qrcodeData[0][0]
         exam.update(utils.qrdata_to_examdata(json.loads(qrcodeData)))
         res.update(utils.qrdata_to_resdata(json.loads(qrcodeData)))
 
@@ -45,6 +46,7 @@ def exam_review():
                 reviewer.setUp(questionCount, choiceCount, buffer=exam["examPhoto"])
             case _:
                 res['err']['noSuchPhotoType'] = 'Please provide a valid examPhoto Type'
+        reviewer.defuse = [0, 0, reviewer.img.shape[1], qrcodeTop]
         reviewer.recognise()
         if hasattr(reviewer, "studentsAnswers"):
             reviewer.kernelSize = 1

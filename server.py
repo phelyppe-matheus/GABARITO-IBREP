@@ -11,10 +11,12 @@ import utils
 from languages import strings
 from ORMGabarito import AnswerSheetRecognitionModel
 
-app = Flask(__name__, template_folder="templates")
 key = os.environ.get("ANSWER_KEY")
 origin = os.environ.get("ACCEPT_ORIGINS", "*").split(",")
 ibrep_url = os.environ.get("IBREP_URL", "https://ibrep.alfamaoraculo.com.br/api/set/score")
+
+app = Flask(__name__, template_folder="templates")
+CORS(app, origins=origin)
 fernet = Fernet(key)
 supported_languages = ["en", "pt"]
 
@@ -23,7 +25,6 @@ def goto_capture():
     return redirect("/exam/capture")
 
 @app.route("/api/exam/review", methods=["POST"])
-@cross_origin(origins=origin)
 def exam_review():
     res = {"err": {}}
     try:
@@ -92,7 +93,6 @@ def make_qr_code():
 
 
 @app.route("/encrypt", methods=["POST"])
-@cross_origin(origins=origin)
 def encrypt():
     data = request.json
     if ("msg" not in data): return jsonify({"err": "no message to encrypt"})

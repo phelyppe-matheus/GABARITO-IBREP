@@ -178,10 +178,7 @@
                 .then(data => {
                     if (!dataHasErr(data)) {
                         gabaritoData = data
-                        Swal.fire({
-                            text: "Dados de gabarito e QR salvos",
-                            icon: "success"
-                        });
+                        sendSuccessMessage();
                         sendToIbrep();
                         return;
                     } else {
@@ -195,22 +192,37 @@
                 })
         }
 
+        async function sendSuccessMessage() {
+            try {
+                Swal.fire({
+                    text: "Dados de gabarito e QR salvos",
+                    icon: "success"
+                });
+            } catch(e) {
+                alert("Dados de gabarito e QR salvos"); 
+            }
+        }
+
         function askIdMatricula() {
-            return Swal.fire({
-                title: "Digite a matricula",
-                input: "tel",
-                inputLabel: "Digite o Idmatricula do aluno em específico",
-                inputPlaceholder: "ex.: 654321",
-                inputAttributes: {
-                    maxlength: "10",
-                    autocapitalize: "off",
-                    autocorrect: "off"
-                }
-                // preConfirm: () => {
-                //     return document.getElementById("idmatricula").value;
-                // }
-            })
-                .then(data => data.value)
+            try {
+                return Swal.fire({
+                    title: "Digite a matricula",
+                    input: "tel",
+                    inputLabel: "Digite o Idmatricula do aluno em específico",
+                    inputPlaceholder: "ex.: 654321",
+                    inputAttributes: {
+                        maxlength: "10",
+                        autocapitalize: "off",
+                        autocorrect: "off"
+                    }
+                    // preConfirm: () => {
+                    //     return document.getElementById("idmatricula").value;
+                    // }
+                })
+                    .then(data => data.value)
+            } catch(e) {
+                return window.prompt("Digite o Idmatricula do aluno em específico");
+            }
         }
 
         function dataHasErr(data) {
@@ -258,10 +270,50 @@
             errors = data["err"];
 
             errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-            Swal.fire({
-                text: errStr,
-                icon: "error"
-            });
+            try {
+                Swal.fire({
+                    text: errStr,
+                    icon: "error"
+                });
+            } catch(e) {
+                window.alert(errStr);
+            }
+        }
+
+        function handleAlert(
+            title,
+            input,
+            {
+                inputLabel = "Digite o Idmatricula do aluno em específico",
+                inputPlaceholder = "ex.: 654321",
+                inputAttributes = {
+                    maxlength: "10",
+                    autocapitalize: "off",
+                    autocorrect: "off"
+                }
+            // preConfirm: () => {
+            //     return document.getElementById("idmatricula").value;
+            // }
+        } = {}) {
+            try {
+                return Swal.fire({
+                    title,
+                    input,
+                    inputLabel,
+                    inputPlaceholder,
+                    inputAttributes: {
+                        maxlength,
+                        autocapitalize,
+                        autocorrect,
+                    }
+                    // preConfirm: () => {
+                    //     return document.getElementById("idmatricula").value;
+                    // }
+                })
+                    .then(data => data.value)
+            } catch(e) {
+                return window.prompt(inputLabel);
+            }
         }
 
         async function sendToIbrep() {

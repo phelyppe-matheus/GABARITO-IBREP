@@ -9,7 +9,7 @@ qreader = QReader()
 class ORMParameters:
     minArea = 1500
     lowThreshold = 0.5
-    hitThreshold = 0.7
+    hitThreshold = 0.55
 
 class AnswerSheetRecognitionModel:
     choiceWidth = 140
@@ -223,7 +223,7 @@ if __name__ == '__main__':
         # "test_15.jpg": ['E','D','C','B','C','B','C','D','C','D','D','C','B','D','C','B','C','D','E'],
         # "test_16.jpg": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D'],
         # "test_18.png": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D','B'],
-        "test_20.jpeg": ['D','C','D','C','D','D','B','D','E','C','B','A','?','D','E','C','B','A','D','B'],
+        "f21d4275-982e-4494-b15e-122d349cc6c9.jfif": ['D','C','D','C','D','D','B','D','E','C'],
     }
     choices = []
 
@@ -242,7 +242,7 @@ if __name__ == '__main__':
             answerKernel = np.pad(answerKernel,(math.floor((asrm.choiceWidth-kernelSize)/2), math.ceil((asrm.choiceWidth-kernelSize)/2)))
             normalKernel = (answerKernel[::]).astype(np.uint8)
             inverseKernel = (answerKernel == 0).astype(np.uint8)
-            print(asrm.studentsAnswers)
+            print(asrm.answersProb)
 
             cv2.imshow("img", cv2.resize(asrm.img, (0,0), fx=0.35, fy=0.35))
             cv2.imshow("imgMarked", cv2.resize(imgMarked, (0,0), fx=0.35, fy=0.35))

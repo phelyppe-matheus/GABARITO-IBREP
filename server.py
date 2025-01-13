@@ -52,10 +52,24 @@ def exam_review():
         else:
             res['err']['noSheet'] = "Não pude reconhecer as questões"
         if "correctAnswers" in exam:
+            # Decrypt correctAnswers
             exam["correctAnswers"] = bytes(exam["correctAnswers"], "utf-8")
             exam["correctAnswers"] = fernet.decrypt(exam["correctAnswers"]).decode("utf-8")
+
+            print(f"correctAnswers (decriptografado): {exam['correctAnswers']}")  # Para depuração
+
+            # Convertendo a sequência para lista de caracteres
             exam["correctAnswers"] = [*exam["correctAnswers"]]
-            exam["correctAnswers"] = np.char.mod("%c", np.array(exam["correctAnswers"]).astype(np.int16)+65).tolist()
+
+            # Ajustando as respostas com base no número de alternativas disponíveis
+            choices_count = int(exam["choicesCount"])
+
+            # Mapeando as respostas de forma dinâmica
+            mapped_answers = [utils.map_answer_to_letter(int(answer), choices_count) for answer in exam["correctAnswers"]]
+
+            print(f"correctAnswers após mapeamento dinâmico: {mapped_answers}")  # Para depuração
+
+            exam["correctAnswers"] = mapped_answers
 
             if len(exam["correctAnswers"]) == questionCount:
                 reviewer.reviewAnswers(exam["correctAnswers"])

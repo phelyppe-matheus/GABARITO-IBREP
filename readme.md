@@ -21,11 +21,12 @@ _JSON_
 
 ## Envios
 ### Image Input
-|ID|Descrição|
-|---|---|
-|0|Use esse tipo caso examPhoto esteja em base64|
-|1|Use esse tipo caso examPhoto esteja em bits|
-|2|Use esse tipo caso examPhoto seja um link (Não suportado ainda)|
+|ID|Descrição|Suportado|Para testes|
+|---|---|---|---|
+|0|Use esse tipo caso examPhoto esteja em base64|Sim|NÂO|
+|1|Use esse tipo caso examPhoto esteja em bits|Sim|NÂO|
+|2|Use esse tipo caso examPhoto seja um link|NÂO|NÂO|
+|2|Use esse tipo caso examPhoto seja uma imgpath no server|Sim|Sim|
 
 ## Erros
 ### Tipos de erros

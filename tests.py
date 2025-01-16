@@ -1,5 +1,4 @@
 from controller import reviewController
-from pprint import pprint
 
 def test_all_good():
     exam = {
@@ -11,7 +10,7 @@ def test_all_good():
     reviewController(exam=exam, response=response)
 
     response["marked"] = "img"
-    pprint(response)
+    print(response)
 
 
 def test_test():
@@ -24,6 +23,6 @@ def test_test():
     reviewController(exam=exam, response=response)
 
     response["marked"] = "img"
-    pprint(response)
+    print(response)
 
 test_all_good()

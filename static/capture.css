@@ -1,109 +1,151 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
+/* 
 body {
-    --bggap: 2px;
-    --bgopacity: 0.1;
+    position: relative;
+}
+
+was a cool design but kinda tacky and difficult to mantain
+
+body::before {
+    --bggap: 50px;
+    --bgopacity: 0.3;
+    --circle-radius: 5px;
+    --circle-diameter: calc(2 * var(--circle-radius));
+    --circle-pos-ax: calc(-1 * var(--circle-radius));
+    --circle-pos-ay: calc(02 * var(--circle-radius));
+    --circle-pos-bx: calc(01 * var(--circle-radius));
+    --circle-pos-by: calc(02 * var(--circle-radius));
+    --circle-pos-cx: calc(04 * var(--circle-radius));
+    --circle-pos-cy: calc(02 * var(--circle-radius));
+    --circle-pos-dx: calc(02 * var(--circle-radius));
+    --circle-pos-dy: calc(02 * var(--circle-radius));
     --bgsolid: black;
-    --ibrepblue: hsla(194, 100%, 55%, var(--bgopacity));
-    --ibrepviolet: hsla(297, 100%, 32%, var(--bgopacity));
+    --ibrepblue: hsla(194, 100%, 55%);
+    --ibrepblueOFF: hsla(194, 100%, 55%, var(--bgopacity));
+    --ibrepviolet: hsla(297, 100%, 32%);
+    --ibrepvioletOFF: hsla(297, 100%, 32%, var(--bgopacity));
 
     font-family: "Work Sans", 'Courier New', Courier, monospace;
 
+    content: "";
+    position: fixed;
+    inset: calc(var(--bggap) / -2);
+    inset: 0;
+    z-index: -1;
+
     background-color: var(--bgsolid);
     background:
-        radial-gradient(circle at 20px -10px, var(--bgsolid), var(--bgsolid) 20px, transparent 20px),
-        radial-gradient(circle at 20px 10px, var(--ibrepviolet), var(--ibrepviolet) 20px, transparent 20px),
-        radial-gradient(circle at 20px 40px, var(--bgsolid), var(--bgsolid) 20px, transparent 20px),
-        radial-gradient(circle at 20px 20px, var(--ibrepblue), var(--ibrepblue) 20px, transparent 20px),
-        radial-gradient(circle at 20px -10px, var(--bgsolid), var(--bgsolid) 20px, transparent 20px),
-        radial-gradient(circle at 20px 10px, var(--ibrepviolet), var(--ibrepviolet) 20px, transparent 20px),
-        radial-gradient(circle at 20px 40px, var(--bgsolid), var(--bgsolid) 20px, transparent 20px),
-        radial-gradient(circle at 20px 20px, var(--ibrepblue), var(--ibrepblue) 20px, transparent 20px),
+        radial-gradient(circle at var(--circle-pos-ay) var(--circle-pos-ax), var(--bgsolid), var(--bgsolid) var(--circle-diameter), transparent var(--circle-diameter)),
+        radial-gradient(circle at var(--circle-pos-by) var(--circle-pos-bx), var(--ibrepvioletOFF), var(--ibrepvioletOFF) var(--circle-diameter), transparent var(--circle-diameter)),
+        radial-gradient(circle at var(--circle-pos-cy) var(--circle-pos-cx), var(--bgsolid), var(--bgsolid) var(--circle-diameter), transparent var(--circle-diameter)),
+        radial-gradient(circle at var(--circle-pos-dy) var(--circle-pos-dx), var(--ibrepblueOFF), var(--ibrepblueOFF) var(--circle-diameter), transparent var(--circle-diameter)),
+        radial-gradient(circle at var(--circle-pos-ay) var(--circle-pos-ax), var(--bgsolid), var(--bgsolid) var(--circle-diameter), transparent var(--circle-diameter)),
+        radial-gradient(circle at var(--circle-pos-by) var(--circle-pos-bx), var(--ibrepvioletOFF), var(--ibrepvioletOFF) var(--circle-diameter), transparent var(--circle-diameter)),
+        radial-gradient(circle at var(--circle-pos-cy) var(--circle-pos-cx), var(--bgsolid), var(--bgsolid) var(--circle-diameter), transparent var(--circle-diameter)),
+        radial-gradient(circle at var(--circle-pos-dy) var(--circle-pos-dx), var(--ibrepblueOFF), var(--ibrepblueOFF) var(--circle-diameter), transparent var(--circle-diameter)),
         var(--bgsolid)
     ;
-    background-size: calc(80px + 2*var(--bggap)) calc(60px + var(--bggap));
+    background-size: calc(var(--circle-diameter) + var(--bggap)) calc(3 * var(--circle-diameter) + var(--bggap));
     background-position:
         0 0, 0 0,
-        0 calc(30px + var(--bggap)), 0 calc(30px + var(--bggap)),
-        calc(40px + var(--bggap)) 30px, calc(40px + var(--bggap)) 30px,
-        calc(40px + var(--bggap)) 0, calc(40px + var(--bggap)) 0;
-    background-origin: center;
+        0 calc(3 * var(--circle-radius) + var(--bggap)), 0 calc(3 * var(--circle-radius) + var(--bggap)),
+        calc(var(--bggap) / 2 + var(--circle-radius)) calc(var(--bggap) / 2 + var(--circle-radius)), calc(var(--bggap) / 2 + var(--circle-radius)) calc(var(--bggap) / 2 + var(--circle-radius)),
+        calc(var(--bggap) / 2 + var(--circle-radius)) calc(-3 * var(--circle-radius) + var(--bggap) / 2  + var(--circle-radius)), calc(var(--bggap) / 2 + var(--circle-radius)) calc(-3 * var(--circle-radius) + var(--bggap) / 2 + var(--circle-radius));
+}
+ */
+
+body {
+    background-color: black;
 }
 
 button {
     border: none;
+}
+button.loading {
+    --font-opacity: 30%;
+    filter: brightness(0.5);
+}
+
+/* HTML: <div class="loader"></div> */
+body.loading .loader {
+    width: 30%;
+    aspect-ratio: 4;
+    background: radial-gradient(circle closest-side, black 90%,#0000) 0/calc(100%/3) 100% no-repeat;
+    animation: l2 1s steps(3) infinite;
+    align-self: center;
+    justify-self: center;
+}
+@keyframes l2 {to{background-position: 150%}}
+
+body.loading .exam-pic-camera .exam-overlay {
+    display: none;
 }
 
 .container {
     height: 100vh;
     width: 100vw;
     display: grid;
+    place-content: stretch;
     place-content: center;
 }
 
 .exam-pic-camera {
+    --font-opacity: 100%;
+
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 1fr auto 3rem;
+    grid-template-columns: 0.5rem repeat(4, 1fr) 0.5rem;
+    grid-template-rows: 4rem auto 4rem;
     place-content: center;
-    place-items: center;
 
-    width: fit-content;
-    height: fit-content;
+    gap: 0.5rem;
+    padding: 4rem 0;
+    max-width: 600px;
 }
 
-.exam-pic-camera .canva-container, .exam-pic-camera .final-output {
-    z-index: -1;
+.video-container, .float-canva, .loader {
+    grid-column: 1/7;
+    grid-row: 2/3;
 }
 
-.exam-pic-camera .video-container, .exam-pic-camera .canva-container, .exam-pic-camera .final-output {
-    grid-area: 1/1/4/5;
+.exam-pic-camera::before {
+    content: "";
+    grid-column: 1/2;
+    grid-row: 3/4;
 }
 
-.exam-pic-camera .video-container video {
-    width: 100%;
-    height: 100%;
-}
-
-.exam-pic-camera .cam-opt {
-    z-index: 10;
-    height: 80%;
-    aspect-ratio: 1;
-
-    border-radius: 50%;
-    color: hsl(0, 72%, 100%);
-}
-
-.ibrep-icon {
-    clip-path: path("M17.5 1.5C11.9835 1.5 7.5 6.03497 7.5 11.6435C7.5 13.6772 8.08956 15.5696 9.10431 17.1563C11.1205 14.746 14.1327 13.213 17.5 13.213C20.8673 13.213 23.8795 14.746 25.8957 17.1563C26.9104 15.5696 27.5 13.6772 27.5 11.6435C27.5 6.03497 23.0165 1.5 17.5 1.5ZM26.536 18C27.7743 16.1967 28.5 14.005 28.5 11.6435C28.5 5.49552 23.5815 0.5 17.5 0.5C11.4185 0.5 6.5 5.49552 6.5 11.6435C6.5 14.005 7.22568 16.1967 8.46401 18C7.22568 19.8033 6.5 21.995 6.5 24.3565C6.5 30.5045 11.4185 35.5 17.5 35.5C23.5815 35.5 28.5 30.5045 28.5 24.3565C28.5 21.995 27.7743 19.8033 26.536 18ZM25.2934 18C23.4587 15.6886 20.6484 14.213 17.5 14.213C14.3516 14.213 11.5413 15.6886 9.70662 18C11.5413 20.3114 14.3516 21.787 17.5 21.787C20.6484 21.787 23.4587 20.3114 25.2934 18ZM9.10431 18.8437C11.1205 21.254 14.1327 22.787 17.5 22.787C20.8673 22.787 23.8795 21.254 25.8957 18.8437C26.9104 20.4304 27.5 22.3228 27.5 24.3565C27.5 29.965 23.0165 34.5 17.5 34.5C11.9835 34.5 7.5 29.965 7.5 24.3565C7.5 22.3228 8.08956 20.4304 9.10431 18.8437Z");
-    height: 36px;
-    aspect-ratio: 1;
-    background-color: white;
-    scale: .8;
+.cam-opt {
+    grid-row: 3/4;
+    border-radius: 25%;
+    color: hsla(0, 0%, 100%, var(--font-opacity));
 }
 
 .exam-pic-camera #snap {
-    grid-area: 3/3/4/4;
     background-color: hsl(0, 72%, 40%);
 }
 
 .exam-pic-camera #send {
-    grid-area: 3/4/4/5;
     background-color: hsl(90, 72%, 40%);
 }
 
 .exam-pic-camera #flip {
-    grid-area: 3/2/4/3;
     background-color: hsl(55, 72%, 40%);
 }
 
 .exam-pic-camera #menu {
-    grid-area: 2/4/3/5;
     background-color: hsl(183, 72%, 40%);
     height: auto;
 }
 
 .exam-pic-camera #retry {
-    grid-area: 3/1/4/2;
     color: black;
+}
+
+
+.exam-pic-camera #expand {
+    grid-area: 1/5/2/6;
+    color: white;
+    background-color: #0000;
+    aspect-ratio: 1;
+    justify-self: end;
 }

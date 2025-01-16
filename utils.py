@@ -11,6 +11,7 @@ def qrdata_to_resdata(qrdata):
     resdata["iddisciplina"] = qrdata["d"]
     resdata["idtipo"] = qrdata["t"]
     resdata["idmodelo"] = qrdata["m"]
+    resdata["idprova_impressa"] = qrdata["p"]
 
     return resdata
 
@@ -21,7 +22,6 @@ def map_answer_to_letter(answerNum, choicesCount):
     Exemplo: Se choicesCount = 5, mapeia 1 -> 'A', 2 -> 'B', 3 -> 'C', 4 -> 'D', 5 -> 'E'.
     """
     # Calcula a letra de acordo com o número de alternativas
-    print(answerNum, chr(65 + (answerNum) % choicesCount))
     return chr(65 + (answerNum) % choicesCount)  # Modulo para garantir o ciclo correto
 
 def update(d, u):

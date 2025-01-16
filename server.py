@@ -7,9 +7,12 @@ import os
 from languages import strings
 from controller import reviewController
 
-app = Flask(__name__, template_folder="templates")
 key = os.environ.get("ANSWER_KEY")
+origin = os.environ.get("ACCEPT_ORIGINS", "*").split(",")
 ibrep_url = os.environ.get("IBREP_URL", "https://ibrep.alfamaoraculo.com.br/api/set/score")
+
+app = Flask(__name__, template_folder="templates")
+CORS(app, origins=origin)
 fernet = Fernet(key)
 supported_languages = ["en", "pt"]
 
@@ -18,7 +21,6 @@ def goto_capture():
     return redirect("/exam/capture")
 
 @app.route("/api/exam/review", methods=["POST"])
-@cross_origin(origins="*")
 def exam_review():
     res = {"err": {}}
     exam = request.json
@@ -29,7 +31,7 @@ def exam_review():
     except ValueError as e:
         res['err']["wrongValue"] = str(e)
     except Exception as e:
-        res['err']["unknown"] =str(e)
+        res['err']["unknown"] = str(e)
     return jsonify(res)
 
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/webcam-easy@1.1.1/dist/webcam-easy.min.js"></script>
+    <!-- <script src="https://unpkg.com/webcam-easy@1.1.1/dist/webcam-easy.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" type="image/svg" href="{{url_for('static', filename='favicon.svg')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -14,8 +14,9 @@
 <body>
     <div class="container">
         <div class="exam-pic-camera">
+            <button id="expand" onclick="askForFullScreen()" class="screen-opt" download><i class="fa fa-expand"></i></button>
             <div class="video-container">
-                <video id="webCam" autoplay playsinline></video>
+                <video id="webCam" muted autoplay playsinline></video>
             </div>
             <div class="float-canva canva-container">
                 <canvas id="canvas"></canvas>
@@ -23,47 +24,132 @@
             <div class="float-canva final-output">
                 <canvas id="canvas-to-send"></canvas>
             </div>
-            <button id="snap" onclick="snap(); return true;" class="cam-opt" download><i class="fa fa-camera"></i></button>
-            <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
+            <div class="float-canva exam-overlay">
+                <img src="/static/overlay/examLayoutOverlay.svg" alt="" id="exam-overlay" ondrop="loadImageForm(event)" style="display: none;">
+            </div>
+            <div class="loader"></div>
             <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
-            <button id="flip" onclick="webcam.flip();webcam.start();return true;" class="cam-opt"><i class="fa fa-rotate-right"></i></button>
-            <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button>
+            <button id="flip" onclick="videoTrack.applyConstraints({advanced:[{torch:true}]});return true;" class="cam-opt"><i class="fa fa-flash"></i></button>
+            <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
+            <button id="snap" onclick="snap(); return true;" class="cam-opt" download><i class="fa fa-camera"></i></button>
+            <!-- <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button> -->
         </div>
     </div>
     <script>
         const webCamElement = document.getElementById("webCam");
         const canvasElement = document.getElementById("canvas");
         const canvasToSend = document.getElementById("canvas-to-send");
-        const webcam = new Webcam(webCamElement, "user", canvasElement);
+        const overlayElement = document.getElementById("exam-overlay")
 
+        var webCamStream;
         var gabaritoData;
         var errors;
         var questionCount;
         var choicesCount;
+        var id_solicitacao_prova;
 
         var imgBuffer;
 
-        webcam.start()
-            .catch((e) => {
-                console.log(e.constraint);
+        navigator.mediaDevices
+            .getUserMedia({ video: {facingMode: "environment", resizeMode: "none" }, audio: false })
+            .then((stream) => {
+                webCamElement.srcObject = stream;
+                webCamElement.play();
+                webCamStream = stream;
+                setUpExamOverlay(stream.getVideoTracks()[0].getSettings());
+            })
+            .catch((err) => {
+                console.error(`An error occurred: ${err}`);
             });
 
-        function snap() {
+        function cancelElementDrag(el) {
+            el.addEventListener("dragenter", (event) => {
+                event.preventDefault();
+            });
 
-            imgBuffer = webcam.snap();
-            const image = document.createElement("img");
-            image.src=imgBuffer;
+            el.addEventListener("dragover", (event) => {
+                event.preventDefault();
+            });
+        }
 
-            image.onload = () => {
-                canvasToSend.height = image.height;
-                canvasToSend.width = image.width;
-                canvasToSend.getContext("2d").drawImage(image, 0, 0);
+        cancelElementDrag(overlayElement);
+        cancelElementDrag(webCamElement);
+        cancelElementDrag(canvasElement);
+
+        webCamElement.ondrop = loadImageForm;
+        canvasElement.ondrop = loadImageForm;
+        overlayElement.ondrop = loadImageForm;
+
+        function askForFullScreen() {
+            Swal.fire({
+                title: "Permite tela cheia?",
+                text: "Com a tela cheia, você pode usar o aplicativo mais eficientemente",
+                showCancelButton: true,
+                confirmButtonText: "Permitir",
+                confirmButtonAriaLabel: "Permitir o uso do aplicativo em tela cheia",
+                cancelButtonText: "Melhor não, obrigado",
+                cancelButtonAriaLabel: "Não permitir o uso do aplicatico em tela cheia"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.body.requestFullscreen();
+                } 
+            })
+        }
+
+        askForFullScreen();
+
+        function setUpExamOverlay(dimensions) {
+            let overlay = document.getElementById("exam-overlay");
+
+            overlay.style.setProperty('height', `${dimensions.height}px`);
+            overlay.style.setProperty('width', `${dimensions.width}px`);
+            overlay.style.setProperty('display', "block");
+        }
+
+        async function loadImageForm(e) {
+            e.preventDefault();
+
+            let file = e.dataTransfer.files[0];
+            let img = new Image();
+
+            img.onload = () => {
+                canvasToSend.height = img.height;
+                canvasToSend.width = img.width;
+                canvasToSend.getContext("2d").drawImage(img, 0, 0);
                 webCamElement.parentElement.style.zIndex = "-1";
+    
+                imgBuffer = canvasToSend.toDataURL();
             }
+
+            img.src = URL.createObjectURL(file);
+        }
+
+        function snap() {
+            const tracks = webCamStream.getVideoTracks()[0];
+            const streamSettings = tracks.getSettings();
+            let imgCapture = new ImageCapture(tracks);
+
+            document.getElementById("snap").classList.add("loading");
+            imgCapture.takePhoto()
+                .then(blob => {
+                    let img = new Image();
+
+                    img.onload = () => {
+                        canvasToSend.height = img.naturalHeight;
+                        canvasToSend.width = img.naturalWidth;
+                        canvasToSend.getContext("2d").drawImage(img, 0, 0);
+                        webCamElement.parentElement.style.zIndex = "-1";
+                        imgBuffer = canvasToSend.toDataURL();
+                        document.getElementById("snap").classList.remove("loading");
+                    }
+                    
+                    img.src = URL.createObjectURL(blob);
+                })
         }
 
         function retry() {
-            canvasToSend.getContext("2d").clearRect(0, 0, canvasToSend.width, canvasToSend.height);
+            canvasToSend.height = 1;
+            canvasToSend.width = 1;
             webCamElement.parentElement.style.position = "relative";
             webCamElement.parentElement.style.zIndex = "0";
         }
@@ -78,6 +164,7 @@
             }
 
             document.body.classList.add("loading")
+            document.getElementById("send").classList.add("loading")
 
             fetch(url, {
                 method: 'POST',
@@ -89,50 +176,166 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (!("err" in data) || Object.entries(!data["err"]).length === 0) {
+                    if (!dataHasErr(data)) {
                         gabaritoData = data
-                        Swal.fire({
-                            text: "Dados de gabarito e QR salvos",
-                            icon: "success"
-                        });
+                        sendSuccessMessage();
+                        sendToIbrep();
                         return;
+                    } else {
+                        handleApiError(data)
                     }
-                    errors = data["err"];
-
-                    errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-                    Swal.fire({
-                        text: errStr,
-                        icon: "error"
-                    });
                 })
                 .catch(err => console.log(err))
                 .finally(() => {
                     document.body.classList.remove("loading")
+                    document.getElementById("send").classList.remove("loading")
                 })
         }
 
+        async function sendSuccessMessage() {
+            try {
+                Swal.fire({
+                    text: "Dados de gabarito e QR salvos",
+                    icon: "success"
+                });
+            } catch(e) {
+                alert("Dados de gabarito e QR salvos"); 
+            }
+        }
+
         function askIdMatricula() {
-            return Swal.fire({
-                title: "digite a matricula do aluno em questão",
-                html: '<input id="idmatricula" class="swal2-input">',
-                focusConfirm: false,
-                preConfirm: () => {
-                    return document.getElementById("idmatricula").value;
-                }
+            try {
+                return Swal.fire({
+                    title: "Digite a matricula",
+                    input: "tel",
+                    inputLabel: "Digite o Idmatricula do aluno em específico",
+                    inputPlaceholder: "ex.: 654321",
+                    inputAttributes: {
+                        maxlength: "10",
+                        autocapitalize: "off",
+                        autocorrect: "off"
+                    }
+                    // preConfirm: () => {
+                    //     return document.getElementById("idmatricula").value;
+                    // }
+                })
+                    .then(data => data.value)
+            } catch(e) {
+                return window.prompt("Digite o Idmatricula do aluno em específico");
+            }
+        }
+
+        function dataHasErr(data) {
+            if (!("err" in data)) return false
+            if (!(data["err"])) return false
+            if (Object.entries(data["err"]).length === 0) return false
+            return true
+        }
+
+        function makeTextExamButtons(test) {
+            return `<button 
+                onclick='id_solicitacao_prova=${test["id_solicitacao_prova"]}'>
+                De ${test['de']} até ${test['ate']}
+            </button>`;
+        }
+
+        function handleIbrepApiFollowUp(followUpData) {
+            html = "<h1>Selecione a prova desejada</h1>";
+
+            followUpData['follow_up'].forEach(test => {
+                html += makeTextExamButtons(test);
+            });
+
+            Swal.fire({
+                html: html,
+                icon: 'info'
             })
-                .then(data => data.value)
+                .then((result) => {
+                    sendToIbrep()
+                        .then(() => {
+                            id_solicitacao_prova = undefined;
+                        });
+                });
+        }
+
+        function handleIbrepApiAnswer(answer) {
+            Swal.fire({
+                html: `<div>Aluno: ${answer["aluno"][0]["aluno"]}</div><div>\nNota: ${answer['nota']}</div>`,
+                icon: 'success'
+            });
+            gabaritoData = {}
+        }
+
+        function handleApiError(data) {
+            errors = data["err"];
+
+            errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
+            try {
+                Swal.fire({
+                    text: errStr,
+                    icon: "error"
+                });
+            } catch(e) {
+                window.alert(errStr);
+            }
+        }
+
+        function handleAlert(
+            title,
+            input,
+            {
+                inputLabel = "Digite o Idmatricula do aluno em específico",
+                inputPlaceholder = "ex.: 654321",
+                inputAttributes = {
+                    maxlength: "10",
+                    autocapitalize: "off",
+                    autocorrect: "off"
+                }
+            // preConfirm: () => {
+            //     return document.getElementById("idmatricula").value;
+            // }
+        } = {}) {
+            try {
+                return Swal.fire({
+                    title,
+                    input,
+                    inputLabel,
+                    inputPlaceholder,
+                    inputAttributes: {
+                        maxlength,
+                        autocapitalize,
+                        autocorrect,
+                    }
+                    // preConfirm: () => {
+                    //     return document.getElementById("idmatricula").value;
+                    // }
+                })
+                    .then(data => data.value)
+            } catch(e) {
+                return window.prompt(inputLabel);
+            }
         }
 
         async function sendToIbrep() {
             const url = "{{conf['ibrep_url']}}/api/set/score";
 
-            idmatricula = await askIdMatricula()
+            while (true) {
+                idmatricula = await askIdMatricula()
+                if (idmatricula) {
+                    break;
+                }
+                await Swal.fire({
+                    text: "Necessito da matricula do aluno em questão.",
+                    icon: "error"
+                });
+            }
 
             iddisciplina = gabaritoData["iddisciplina"]
             nota = gabaritoData["score"]
             idtipo = gabaritoData["idtipo"]
             idmodelo = gabaritoData["idmodelo"]
             marked = gabaritoData["marked"]
+            idprova_impressa = gabaritoData["idprova_impressa"]
             protocolo = "prova final"
 
             body = {
@@ -143,6 +346,8 @@
                 idmodelo,
                 protocolo,
                 marked,
+                id_solicitacao_prova,
+                idprova_impressa
             }
 
             document.body.classList.add("loading")
@@ -153,26 +358,20 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (!("err" in data) || Object.entries(!data["err"]).length === 0) {
-                    Swal.fire({
-                        html: `<div>Aluno: ${data["aluno"][0]["aluno"]}</div><div>\nNota: ${data['nota']}</div>`,
-                        icon: 'success'
-                    });
-                    gabaritoData = {}
+                if ('follow_up' in data) {
+                    handleApiError({"err": {"1": "Existem mais de 1 prova para esse aluno hoje. Por favor, contacte o IBREP para mais informações."}})
                     return;
+                    handleIbrepApiFollowUp(data);
+                } else if (!dataHasErr(data)) {
+                    handleIbrepApiAnswer(data);
+                } else {
+                    handleApiError(data);
                 }
-                errors = data["err"]
-
-                errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-                Swal.fire({
-                    text: errStr,
-                    icon: 'error'
-                });
             })
-            .catch(err => Swal.fire({
-                text: err,
-                icon: 'error'
-            }))
+            // .catch(err => Swal.fire({
+            //     text: err,
+            //     icon: 'error'
+            // }))
             .finally(() => {
                 document.body.classList.remove("loading")
             })

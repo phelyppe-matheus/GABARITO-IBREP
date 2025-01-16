@@ -9,7 +9,7 @@ qreader = QReader()
 class ORMParameters:
     minArea = 1500
     lowThreshold = 0.5
-    hitThreshold = 0.7
+    hitThreshold = 0.55
 
 class AnswerSheetRecognitionModel:
     choiceWidth = 140
@@ -27,7 +27,7 @@ class AnswerSheetRecognitionModel:
     
     def getQrCodeData(self, path = None, base64=None, buffer=None):
         self.loadimg(path, base64, buffer)
-        return qreader.detect_and_decode(self.img)
+        return qreader.detect_and_decode(self.img, True)
 
     def setUp(self, questionCount, choiceCount, path = None, base64=None, buffer=None):
         self.questionCount = questionCount
@@ -102,6 +102,16 @@ class AnswerSheetRecognitionModel:
         if self.choiceCount >= self.questionCount :imgBlur = cv2.GaussianBlur(imgGray, (5,5), 1)
         else: imgBlur = cv2.GaussianBlur(imgGray, (3,3), 1)
         imgCanny = cv2.Canny(imgBlur,10,50)
+        if hasattr(self, 'defuse') and self.defuse:
+            sX = self.imgWidth/img.shape[1]
+            sY = self.imgWidth/img.shape[0]
+
+            self.defuse[0] = int(self.defuse[0] * sX)
+            self.defuse[1] = int(self.defuse[1] * sY)
+            self.defuse[2] = int(self.defuse[2] * sX)
+            self.defuse[3] = int(self.defuse[3] * sY)
+
+            imgCanny = cv2.rectangle(imgCanny, (self.defuse[0],self.defuse[1]), (self.defuse[2], self.defuse[3]), 0, -1)
 
         return imgResized, imgGray, imgBlur, imgCanny
 

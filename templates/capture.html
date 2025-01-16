@@ -176,13 +176,16 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (!dataHasErr(data)) {
+                    if (dataHasErr(data)) {
+                        handleApiError(data)
+                    } else if (Number(data["iddisciplina"]) === 0) {
+                        data["err"] = {"sem disciplina": "A disciplina está zerada, corrija a prova manualmente"};
+                        handleApiError(data)
+                    } else {
                         gabaritoData = data
                         sendSuccessMessage();
                         sendToIbrep();
                         return;
-                    } else {
-                        handleApiError(data)
                     }
                 })
                 .catch(err => console.log(err))

@@ -20,5 +20,6 @@ def reviewController(exam, response):
 
         review.reviewStudentAnswers(correctAnswers, questionCount)
     utils.update(response, review.response)
+    utils.update(response, utils.qrdata_to_resdata(json.loads(qrcodeData[0][0])))
     utils.update(response['err'], review.reviewer.err)
 

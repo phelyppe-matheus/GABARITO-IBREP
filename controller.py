@@ -10,7 +10,7 @@ def reviewController(exam, response):
     qrcodeData = review.getQrDataFromImage(examPhoto, examPhotoType)[0];
     choiceCount, questionCount, encryptedAnswers = utils.qrdata_to_examdata(json.loads(qrcodeData))
 
-    exam = review.obfuscateExamPage()
+    review.blockPageRactFromDetection()
     review.setUpReviewerByPhotoType(examPhoto, examPhotoType, questionCount, choiceCount)
     review.recognizeAnswersFromPhoto()
     review.setRecognizedAnswersToResponse()

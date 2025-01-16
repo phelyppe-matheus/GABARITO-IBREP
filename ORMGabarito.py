@@ -9,7 +9,7 @@ qreader = QReader()
 class ORMParameters:
     minArea = 1500
     lowThreshold = 0.5
-    hitThreshold = 0.55
+    hitThreshold = 0.65
 
 class AnswerSheetRecognitionModel:
     choiceWidth = 140
@@ -79,13 +79,19 @@ class AnswerSheetRecognitionModel:
             if xcorrect == xstudent:
                 imgStRight = cv2.circle(imgStRight, (xcorrect+width//2, y+height//2), 30, (255), -1)
             if xcorrect != xstudent:
-                imgStWrong = cv2.circle(imgStWrong, (xcorrect+width//2, y+height//2), 30, (255), -1)
-                imgCorrect = cv2.circle(imgCorrect, (xstudent+width//2, y+height//2), 30, (255), -1)
+                imgStWrong = cv2.circle(imgStWrong, (xstudent+width//2, y+height//2), 30, (255), -1)
+                imgCorrect = cv2.circle(imgCorrect, (xcorrect+width//2, y+height//2), 30, (255), -1)
 
-        imgPoints = cv2.merge((imgStWrong, imgStRight, imgCorrect))
+        imgPoints = cv2.merge((imgShaped, imgStRight, imgStWrong))
+        imgPoints[:,:,2] += imgCorrect
+        imgPoints[:,:,1] += imgCorrect
         perspective = cv2.getPerspectiveTransform(self.warpAnswerPoints, self.shapeAnswerPoints)
         imgPointsOriginalPerspective = cv2.warpPerspective(imgPoints, perspective, (img.shape[1], img.shape[0]))
         imgMarked = cv2.add(img, imgPointsOriginalPerspective, (None))
+        imgMarked = cv2.rectangle(imgMarked, (30,30), (220, 125), (30,30,30), -1)
+        imgMarked = cv2.putText(imgMarked, "Correct", (50,60), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,0), 2)
+        imgMarked = cv2.putText(imgMarked, "Wrong", (50,85), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,0,255), 2)
+        imgMarked = cv2.putText(imgMarked, "Actual Answer", (50,110), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,255), 2)
 
         return imgMarked
 

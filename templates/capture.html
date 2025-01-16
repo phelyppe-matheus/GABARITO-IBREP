@@ -322,7 +322,7 @@
             while (true) {
                 idmatricula = await askForNumber("Digite a matricula", "Digite o Idmatricula do aluno em específico")
                 protocolo = await askForNumber("Digite o protocolo", "Digite o protocolo de arquivo da prova")
-                if (idmatricula AND protocolo) {
+                if (idmatricula && protocolo) {
                     break;
                 }
                 await Swal.fire({

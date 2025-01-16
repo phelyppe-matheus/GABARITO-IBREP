@@ -54,9 +54,6 @@ class Review:
             case _:
                 self.response['err']['noSuchPhotoType'] = 'Please provide a valid examPhoto Type'
     
-        if not hasattr(self.reviewer, "imgWarp"):
-            self.response['err']['noWarp'] = "Não pude reconhecer as questões"
-    
     def decryptAnswers(self, correctAnswers, choiceCount):
         # Decrypt correctAnswers
         correctAnswersBytes = bytes(correctAnswers, "utf-8")
@@ -82,10 +79,13 @@ class Review:
 
     def recognizeAnswersFromPhoto(self):
         self.reviewer.recognise()
+    
+        if not hasattr(self.reviewer, "imgWarp"):
+            self.response['err']['noWarp'] = "Não pude reconhecer as questões"
 
     def setRecognizedAnswersToResponse(self):
         if hasattr(self.reviewer, "studentsAnswers"):
             self.reviewer.kernelSize = 1
-            self.response["answers"] = self.reviewer.studentsAnswers
+            self.response["answers"] = np.char.mod("%c", self.reviewer.studentsAnswers+65).tolist()
         else:
             self.response['err']['noSheet'] = "Não pude reconhecer as questões"

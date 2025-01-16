@@ -22,7 +22,7 @@ def map_answer_to_letter(answerNum, choicesCount):
     Exemplo: Se choicesCount = 5, mapeia 1 -> 'A', 2 -> 'B', 3 -> 'C', 4 -> 'D', 5 -> 'E'.
     """
     # Calcula a letra de acordo com o número de alternativas
-    return chr(65 + (answerNum) % choicesCount)  # Modulo para garantir o ciclo correto
+    return chr(65 + (answerNum - 1) % choicesCount)  # Modulo para garantir o ciclo correto
 
 def update(d, u):
     for k, v in u.items():

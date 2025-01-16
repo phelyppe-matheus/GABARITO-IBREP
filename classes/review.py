@@ -29,8 +29,8 @@ class Review:
                 self.response['err']['noSuchPhotoType'] = 'Please provide a valid examPhoto Type'
         return qrCodeData
     
-    def blockPageRactFromDetection(self):
-        self.reviewer.defuse = [0, 0, self.reviewer.img.shape[1], self.qrcodeTop]
+    def blockPageRactFromDetection(self, diffuseY):
+        self.reviewer.defuse = [0, 0, self.reviewer.img.shape[1], diffuseY]
 
     def loadResponse(self):
 

@@ -203,12 +203,12 @@
             }
         }
 
-        function askIdMatricula() {
+        function askForNumber(title, inputLabel) {
             try {
                 return Swal.fire({
-                    title: "Digite a matricula",
+                    title,
                     input: "tel",
-                    inputLabel: "Digite o Idmatricula do aluno em específico",
+                    inputLabel,
                     inputPlaceholder: "ex.: 654321",
                     inputAttributes: {
                         maxlength: "10",
@@ -320,8 +320,9 @@
             const url = "{{conf['ibrep_url']}}/api/set/score";
 
             while (true) {
-                idmatricula = await askIdMatricula()
-                if (idmatricula) {
+                idmatricula = await askForNumber("Digite a matricula", "Digite o Idmatricula do aluno em específico")
+                protocolo = await askForNumber("Digite o protocolo", "Digite o protocolo de arquivo da prova")
+                if (idmatricula AND protocolo) {
                     break;
                 }
                 await Swal.fire({
@@ -336,7 +337,6 @@
             idmodelo = gabaritoData["idmodelo"]
             marked = gabaritoData["marked"]
             idprova_impressa = gabaritoData["idprova_impressa"]
-            protocolo = "prova final"
 
             body = {
                 idmatricula,

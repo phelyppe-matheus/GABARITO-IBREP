@@ -126,7 +126,6 @@
 
         function snap() {
             const tracks = webCamStream.getVideoTracks()[0];
-            webCamElement.pause();
             const streamSettings = tracks.getSettings();
             let imgCapture = new ImageCapture(tracks);
 
@@ -134,6 +133,7 @@
             imgCapture.takePhoto()
                 .then(blob => {
                     let img = new Image();
+                    webCamElement.pause();
 
                     img.onload = () => {
                         canvasToSend.height = img.naturalHeight;

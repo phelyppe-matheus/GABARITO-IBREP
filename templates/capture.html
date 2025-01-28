@@ -202,7 +202,6 @@
             try {
                 Swal.fire({
                     text: "Dados de gabarito e QR salvos",
-                    imageUrl: gabaritoData["marked"],
                     icon: "success"
                 });
             } catch(e) {
@@ -325,6 +324,10 @@
 
         async function sendToIbrep() {
             const url = "{{conf['ibrep_url']}}/api/set/score";
+            await Swal.fire({
+                title: "Enviando a resposta...",
+                imageUrl: gabaritoData["marked"],
+            });
 
             while (true) {
                 idmatricula = await askForNumber("Digite a matricula", "Digite o Idmatricula do aluno em específico")

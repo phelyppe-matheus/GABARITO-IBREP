@@ -126,6 +126,7 @@
 
         function snap() {
             const tracks = webCamStream.getVideoTracks()[0];
+            webCamElement.pause();
             const streamSettings = tracks.getSettings();
             let imgCapture = new ImageCapture(tracks);
 
@@ -144,6 +145,7 @@
                     }
                     
                     img.src = URL.createObjectURL(blob);
+                    webCamElement.play();
                 })
         }
 

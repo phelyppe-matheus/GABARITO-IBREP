@@ -165,6 +165,7 @@
 
             document.body.classList.add("loading")
             document.getElementById("send").classList.add("loading")
+            document.getElementById("send").disabled = true;
 
             fetch(url, {
                 method: 'POST',
@@ -179,8 +180,7 @@
                     if (dataHasErr(data)) {
                         handleApiError(data)
                     } else if (Number(data["iddisciplina"]) === 0) {
-                        data["err"] = {"sem disciplina": "A disciplina está zerada, corrija a prova manualmente"};
-                        handleApiError(data)
+                        data["iddisciplina"] = askForNumber("A disciplina está zerada", "Adicione seu id dessa disciplina")
                     } else {
                         gabaritoData = data
                         sendSuccessMessage();
@@ -192,6 +192,7 @@
                 .finally(() => {
                     document.body.classList.remove("loading")
                     document.getElementById("send").classList.remove("loading")
+                    document.getElementById("send").disabled = false;
                 })
         }
 

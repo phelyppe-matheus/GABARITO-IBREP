@@ -142,10 +142,10 @@
                         webCamElement.parentElement.style.zIndex = "-1";
                         imgBuffer = canvasToSend.toDataURL();
                         document.getElementById("snap").classList.remove("loading");
+                        webCamElement.play();
                     }
                     
                     img.src = URL.createObjectURL(blob);
-                    webCamElement.play();
                 })
         }
 

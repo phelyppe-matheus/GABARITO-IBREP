@@ -4,6 +4,7 @@ import base64
 import math
 import joblib
 
+from strings.review import strings
 from qreader import QReader
 
 qreader = QReader()
@@ -92,9 +93,9 @@ class AnswerSheetRecognitionModel:
         imgPointsOriginalPerspective = cv2.warpPerspective(imgPoints, perspective, (img.shape[1], img.shape[0]))
         imgMarked = cv2.add(img, imgPointsOriginalPerspective, (None))
         imgMarked = cv2.rectangle(imgMarked, (30,30), (220, 125), (30,30,30), -1)
-        imgMarked = cv2.putText(imgMarked, "Correct", (50,60), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,0), 2)
-        imgMarked = cv2.putText(imgMarked, "Wrong", (50,85), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,0,255), 2)
-        imgMarked = cv2.putText(imgMarked, "Actual Answer", (50,110), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,255), 2)
+        imgMarked = cv2.putText(imgMarked, strings["pt"]["correct_answer"], (50,60), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,0), 2)
+        imgMarked = cv2.putText(imgMarked, strings["pt"]["wrong_answer"], (50,85), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,0,255), 2)
+        imgMarked = cv2.putText(imgMarked, strings["pt"]["actual_answer"], (50,110), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,255), 2)
 
         return imgMarked
 

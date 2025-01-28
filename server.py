@@ -4,7 +4,7 @@ from cryptography.fernet import Fernet
 import os
 
 
-from languages import strings
+from strings.tests import strings
 from controller import reviewController
 
 key = os.environ.get("ANSWER_KEY")

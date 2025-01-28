@@ -2,14 +2,17 @@ import cv2
 import numpy as np
 import base64
 import math
+import joblib
+
 from qreader import QReader
 
 qreader = QReader()
+model = joblib.load("model/model.pkl")
 
 class ORMParameters:
     minArea = 1500
     lowThreshold = 0.5
-    hitThreshold = 0.65
+    hitThreshold = 0.465
 
 class AnswerSheetRecognitionModel:
     choiceWidth = 140
@@ -182,7 +185,6 @@ class AnswerSheetRecognitionModel:
 
     def getAnswers(self):
         self.answersProb = np.zeros((self.questionCount, self.choiceCount))
-
         kernelSize = self.getGivenOrCalculateKernel()
 
         roundMiddle = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(kernelSize), int(kernelSize)))
@@ -190,18 +192,23 @@ class AnswerSheetRecognitionModel:
         answerKernel = answerKernel / answerKernel.sum()
 
         for i in range(self.questionCount):
+            choices = []
             for j in range(self.choiceCount):
-                choice = self.getChoice(i, j)
+                choices.append(self.getChoice(i, j).flatten())
 
-                self.answersProb[i,j] = 1-(choice*answerKernel).sum()/255
-            if (self.answersProb[i] > ORMParameters.hitThreshold).sum() > 1:
+            self.answersProb[i] = np.array(model.predict(choices))
+
+            if (self.answersProb[i] == 1).sum() > 1:
                 if 'duplicate' not in self.err: self.err['duplicate'] = []
                 self.err['duplicate'].append(i)
                 self.studentsAnswers[i] = self.answersProb[i].argmax()
-            elif self.answersProb[i].max() > ORMParameters.hitThreshold:
+            elif self.answersProb[i].max() == 1:
                 self.studentsAnswers[i] = self.answersProb[i].argmax()
             else:
                 self.studentsAnswers[i] = -2
+                if 'noanswer' not in self.err: self.err['noanswer'] = []
+                self.err['noanswer'].append(i)
+        cv2.waitKey()
 
     def reviewAnswers(self, correctAnswers):
         correct = 0

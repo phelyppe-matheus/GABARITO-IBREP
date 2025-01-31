@@ -28,10 +28,13 @@ class AnswerSheetRecognitionModel:
         nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         return img
-    
-    def getQrCodeData(self, path = None, base64=None, buffer=None):
+
+    def qrCodeDetect(self, path = None, base64=None, buffer=None):
         self.loadimg(path, base64, buffer)
-        return qreader.detect_and_decode(self.img, True)
+        return qreader.detect(self.img)
+
+    def qrCodeDecode(self, detection_result, path = None, base64=None, buffer=None):
+        return qreader.decode(self.img, detection_result)
 
     def setUp(self, questionCount, choiceCount, path = None, base64=None, buffer=None):
         self.questionCount = questionCount

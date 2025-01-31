@@ -18,15 +18,18 @@ class Review:
     def getQrDataFromImage(self, photo, type):
         match type:
             case 0:
-                qrCodeData = self.reviewer.getQrCodeData(base64=photo)
+                detectionResult = self.reviewer.qrCodeDetect(base64=photo)
             case 1:
-                qrCodeData = self.reviewer.getQrCodeData(buffer=photo)
+                detectionResult = self.reviewer.qrCodeDetect(buffer=photo)
             case 2:
                 raise Exception("Doesn't support link yet")
             case 3:
-                qrCodeData = self.reviewer.getQrCodeData(path=photo)
+                detectionResult = self.reviewer.qrCodeDetect(path=photo)
             case _:
                 self.response['err']['noSuchPhotoType'] = 'Please provide a valid examPhoto Type'
+
+        qrCodeData = self.reviewer.qrCodeDecode(detectionResult[0])
+        self.blockPageRactFromDetection(detectionResult[0]['bbox_xyxy'][1])
         return qrCodeData
     
     def blockPageRactFromDetection(self, diffuseY):

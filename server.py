@@ -45,6 +45,7 @@ def exam_review():
 def exam_capture():
     conf = {}
     conf["strings"] = capture_strings
+    conf["system_title"] = system_title
     conf["school_url"] = system_url
     conf["colors"] = {
         "primary": COLOR_PRIMARY,

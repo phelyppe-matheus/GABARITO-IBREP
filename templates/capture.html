@@ -3,109 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="https://unpkg.com/webcam-easy@1.1.1/dist/webcam-easy.min.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="icon" type="image/svg" href="{{url_for('static', filename='favicon.svg')}}">
+    <title>{{conf['strings']['system_title']}}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="stylesheet" href="{{url_for('static', filename='gabaritocam.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="{{url_for('static', filename='clear.css')}}">
-    <link rel="stylesheet" href="{{url_for('static', filename='capture.css')}}">
-    <title>Document Scanner</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{url_for('static', filename='gabaritocam.js')}}"></script>
+    <script src="{{url_for('static', filename='apihandler.js')}}"></script>
+    <script>
+        let gabaritoCam;
+
+        window.onload = () => {
+            webCamElement = document.getElementById("webCam")
+            canvasToSend = document.getElementById("canvasToSend")
+            gabaritoCam = new GabaritoCam({webCamElement,canvasToSend})
+        }
+
+        async function snap() {
+            await gabaritoCam.snap()
+        }
+
+        async function send() {
+            if (!gabaritoCam.imgBuffer) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Tire uma foto primeiro."
+                });
+                return;
+            }
+            apiHandler = new ApiHandler({imgBuffer:gabaritoCam.imgBuffer})
+            await apiHandler.send()
+            apiHandler.sendSuccessMessage("Leitura bem sucedida, enviando para a escola");
+
+
+            school = new SchoolApiHandler({testData: apiHandler.testData, schoolUrl: "{{conf['school_url']}}/api/set/score"})
+            await school.send();
+            if ("data" in school) {
+                await school.handleIbrepApiAnswer(school.data)
+                await gabaritoCam.showImg(school.imgBuffer)
+            }
+            let clearBuffer = setInterval(() => {
+                gabaritoCam.imgBuffer = ""
+                clearInterval(clearBuffer)
+            }, 1000)
+        }
+    </script>
+    <style>
+        :root {
+            --primary-bt-background: {{conf['colors']['primary']}};
+            --secondary-bt-background: {{conf['colors']['secondary']}};
+            --aux-bt-background: {{conf['colors']['aux']}};
+        }
+    </style>
 </head>
 <body>
+    <div class="loader"></div>
     <div class="container">
-        <div class="exam-pic-camera">
-            <button id="expand" onclick="askForFullScreen()" class="screen-opt" download><i class="fa fa-expand"></i></button>
-            <div class="video-container">
-                <video id="webCam" muted autoplay playsinline></video>
-            </div>
-            <div class="float-canva canva-container">
-                <canvas id="canvas"></canvas>
-            </div>
-            <div class="float-canva final-output">
-                <canvas id="canvas-to-send"></canvas>
-            </div>
-            <div class="float-canva exam-overlay">
-                <img src="/static/overlay/examLayoutOverlay.svg" alt="" id="exam-overlay" ondrop="loadImageForm(event)" style="display: none;">
-            </div>
-            <div class="loader"></div>
-            <button id="retry" onclick="retry();" class="cam-opt" download><i class="fa fa-eraser"></i></button>
-            <button id="flip" onclick="videoTrack.applyConstraints({advanced:[{torch:true}]});return true;" class="cam-opt"><i class="fa fa-flash"></i></button>
-            <button id="send" onclick="send(); return true;" class="cam-opt" download><i class="fa fa-paper-plane"></i></button>
-            <button id="snap" onclick="snap(); return true;" class="cam-opt" download><i class="fa fa-camera"></i></button>
-            <!-- <button id="menu" onclick="sendToIbrep()" class="cam-opt"><div class="ibrep-icon"></div></button> -->
+        <canvas id="canvasToSend"></canvas>
+        <video id="webCam" muted autoplay playsinline></video>
+        <img src="{{url_for('static', filename='overlay/examLayoutOverlay.svg')}}" alt="{{conf['strings']['overlay_alt']}}" id="overlayElement" class="overlay">
+        <div class="options">
+            <button id="flip" onclick="gabaritoCam.torch()" class="cam-opt"><i class="fa fa-flash"></i></button>
+            <button id="expand" onclick="gabaritoCam.askForFullScreen()" class="screen-opt" download><i class="fa fa-expand"></i></button>
         </div>
+        <button id="retry" onclick="gabaritoCam.retry();" class="buttonCam buttonAux buttonLeft" download><i class="fa fa-eraser"></i></button>
+        <button id="send" onclick="send(); return true;" class="buttonCam buttonSecondary buttonRight" download><i class="fa fa-paper-plane"></i></button>
+        <button id="snap" onclick="snap(); return true;" class="buttonCam buttonPrimary buttonCenter" download><i class="fa fa-camera"></i></button>
     </div>
     <script>
-        const webCamElement = document.getElementById("webCam");
-        const canvasElement = document.getElementById("canvas");
-        const canvasToSend = document.getElementById("canvas-to-send");
-        const overlayElement = document.getElementById("exam-overlay")
-
-        var webCamStream;
-        var gabaritoData;
-        var errors;
-        var questionCount;
-        var choicesCount;
-        var id_solicitacao_prova;
-
-        var imgBuffer;
-
-        navigator.mediaDevices
-            .getUserMedia({ video: {facingMode: "environment", resizeMode: "none" }, audio: false })
-            .then((stream) => {
-                webCamElement.srcObject = stream;
-                webCamElement.play();
-                webCamStream = stream;
-                setUpExamOverlay(stream.getVideoTracks()[0].getSettings());
-            })
-            .catch((err) => {
-                console.error(`An error occurred: ${err}`);
-            });
-
-        function cancelElementDrag(el) {
-            el.addEventListener("dragenter", (event) => {
-                event.preventDefault();
-            });
-
-            el.addEventListener("dragover", (event) => {
-                event.preventDefault();
-            });
-        }
-
-        cancelElementDrag(overlayElement);
-        cancelElementDrag(webCamElement);
-        cancelElementDrag(canvasElement);
-
-        webCamElement.ondrop = loadImageForm;
-        canvasElement.ondrop = loadImageForm;
-        overlayElement.ondrop = loadImageForm;
-
-        function askForFullScreen() {
-            Swal.fire({
-                title: "Permite tela cheia?",
-                text: "Com a tela cheia, você pode usar o aplicativo mais eficientemente",
-                showCancelButton: true,
-                confirmButtonText: "Permitir",
-                confirmButtonAriaLabel: "Permitir o uso do aplicativo em tela cheia",
-                cancelButtonText: "Melhor não, obrigado",
-                cancelButtonAriaLabel: "Não permitir o uso do aplicatico em tela cheia"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.body.requestFullscreen();
-                } 
-            })
-        }
-
-        askForFullScreen();
-
-        function setUpExamOverlay(dimensions) {
-            let overlay = document.getElementById("exam-overlay");
-
-            overlay.style.setProperty('height', `${dimensions.height}px`);
-            overlay.style.setProperty('width', `${dimensions.width}px`);
-            overlay.style.setProperty('display', "block");
-        }
-
         async function loadImageForm(e) {
             e.preventDefault();
 
@@ -116,276 +81,29 @@
                 canvasToSend.height = img.height;
                 canvasToSend.width = img.width;
                 canvasToSend.getContext("2d").drawImage(img, 0, 0);
-                webCamElement.parentElement.style.zIndex = "-1";
-    
-                imgBuffer = canvasToSend.toDataURL();
+
+                gabaritoCam.imgBuffer = canvasToSend.toDataURL();
+                gabaritoCam.showImg(gabaritoCam.imgBuffer)
             }
 
             img.src = URL.createObjectURL(file);
         }
 
-        function snap() {
-            const tracks = webCamStream.getVideoTracks()[0];
-            const streamSettings = tracks.getSettings();
-            let imgCapture = new ImageCapture(tracks);
-
-            document.getElementById("snap").classList.add("loading");
-            imgCapture.takePhoto()
-                .then(blob => {
-                    let img = new Image();
-                    webCamElement.pause();
-
-                    img.onload = () => {
-                        canvasToSend.height = img.naturalHeight;
-                        canvasToSend.width = img.naturalWidth;
-                        canvasToSend.getContext("2d").drawImage(img, 0, 0);
-                        webCamElement.parentElement.style.zIndex = "-1";
-                        imgBuffer = canvasToSend.toDataURL();
-                        document.getElementById("snap").classList.remove("loading");
-                        webCamElement.play();
-                    }
-                    
-                    img.src = URL.createObjectURL(blob);
-                })
-        }
-
-        function retry() {
-            canvasToSend.height = 1;
-            canvasToSend.width = 1;
-            webCamElement.parentElement.style.position = "relative";
-            webCamElement.parentElement.style.zIndex = "0";
-        }
-
-        function send() {
-            const url = "/api/exam/review"
-            body = {
-                "choicesCount": Number(choicesCount),
-                "questionCount": Number(questionCount),
-                "examPhotoType": 0,
-                "examPhoto": imgBuffer
-            }
-
-            document.body.classList.add("loading")
-            document.getElementById("send").classList.add("loading")
-            document.getElementById("send").disabled = true;
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (dataHasErr(data)) {
-                        handleApiError(data)
-                    } else if (Number(data["iddisciplina"]) === 0) {
-                        data["iddisciplina"] = askForNumber("A disciplina está zerada", "Adicione seu id dessa disciplina")
-                    } else {
-                        gabaritoData = data
-                        sendSuccessMessage();
-                        sendToIbrep();
-                        return;
-                    }
-                })
-                .catch(err => console.log(err))
-                .finally(() => {
-                    document.body.classList.remove("loading")
-                    document.getElementById("send").classList.remove("loading")
-                    document.getElementById("send").disabled = false;
-                })
-        }
-
-        async function sendSuccessMessage() {
-            try {
-                Swal.fire({
-                    text: "Dados de gabarito e QR salvos",
-                    icon: "success"
+        function enableFileLoad(elements) {
+            elements.forEach(el => {
+                el.addEventListener("dragenter", (event) => {
+                    event.preventDefault();
                 });
-            } catch(e) {
-                alert("Dados de gabarito e QR salvos"); 
-            }
-        }
-
-        function askForNumber(title, inputLabel) {
-            try {
-                return Swal.fire({
-                    title,
-                    input: "tel",
-                    inputLabel,
-                    inputPlaceholder: "ex.: 654321",
-                    inputAttributes: {
-                        maxlength: "10",
-                        autocapitalize: "off",
-                        autocorrect: "off"
-                    }
-                    // preConfirm: () => {
-                    //     return document.getElementById("idmatricula").value;
-                    // }
-                })
-                    .then(data => data.value)
-            } catch(e) {
-                return window.prompt("Digite o Idmatricula do aluno em específico");
-            }
-        }
-
-        function dataHasErr(data) {
-            if (!("err" in data)) return false
-            if (!(data["err"])) return false
-            if (Object.entries(data["err"]).length === 0) return false
-            return true
-        }
-
-        function makeTextExamButtons(test) {
-            return `<button 
-                onclick='id_solicitacao_prova=${test["id_solicitacao_prova"]}'>
-                De ${test['de']} até ${test['ate']}
-            </button>`;
-        }
-
-        function handleIbrepApiFollowUp(followUpData) {
-            html = "<h1>Selecione a prova desejada</h1>";
-
-            followUpData['follow_up'].forEach(test => {
-                html += makeTextExamButtons(test);
+    
+                el.addEventListener("dragover", (event) => {
+                    event.preventDefault();
+                });
+    
+                el.ondrop = loadImageForm;
             });
-
-            Swal.fire({
-                html: html,
-                icon: 'info'
-            })
-                .then((result) => {
-                    sendToIbrep()
-                        .then(() => {
-                            id_solicitacao_prova = undefined;
-                        });
-                });
         }
 
-        function handleIbrepApiAnswer(answer) {
-            Swal.fire({
-                html: `<div>Aluno: ${answer["aluno"][0]["aluno"]}</div><div>\nNota: ${answer['nota']}</div>`,
-                icon: 'success'
-            });
-            gabaritoData = {}
-        }
-
-        function handleApiError(data) {
-            errors = data["err"];
-
-            errStr = Object.entries(errors).reduce((acc, cur) => acc + `\n${cur[0]}: ${cur[1]}`, '').slice(1);
-            try {
-                Swal.fire({
-                    text: errStr,
-                    icon: "error"
-                });
-            } catch(e) {
-                window.alert(errStr);
-            }
-        }
-
-        function handleAlert(
-            title,
-            input,
-            {
-                inputLabel = "Digite o Idmatricula do aluno em específico",
-                inputPlaceholder = "ex.: 654321",
-                inputAttributes = {
-                    maxlength: "10",
-                    autocapitalize: "off",
-                    autocorrect: "off"
-                }
-            // preConfirm: () => {
-            //     return document.getElementById("idmatricula").value;
-            // }
-        } = {}) {
-            try {
-                return Swal.fire({
-                    title,
-                    input,
-                    inputLabel,
-                    inputPlaceholder,
-                    inputAttributes: {
-                        maxlength,
-                        autocapitalize,
-                        autocorrect,
-                    }
-                    // preConfirm: () => {
-                    //     return document.getElementById("idmatricula").value;
-                    // }
-                })
-                    .then(data => data.value)
-            } catch(e) {
-                return window.prompt(inputLabel);
-            }
-        }
-
-        async function sendToIbrep() {
-            const url = "{{conf['ibrep_url']}}/api/set/score";
-            await Swal.fire({
-                title: "Enviando a resposta...",
-                imageUrl: gabaritoData["marked"],
-            });
-
-            while (true) {
-                idmatricula = await askForNumber("Digite a matricula", "Digite o Idmatricula do aluno em específico")
-                protocolo = await askForNumber("Digite o protocolo", "Digite o protocolo de arquivo da prova")
-                if (idmatricula && protocolo) {
-                    break;
-                }
-                await Swal.fire({
-                    text: "Necessito da matricula do aluno em questão.",
-                    icon: "error"
-                });
-            }
-
-            iddisciplina = gabaritoData["iddisciplina"]
-            nota = gabaritoData["score"]
-            idtipo = gabaritoData["idtipo"]
-            idmodelo = gabaritoData["idmodelo"]
-            marked = gabaritoData["marked"]
-            idprova_impressa = gabaritoData["idprova_impressa"]
-
-            body = {
-                idmatricula,
-                iddisciplina,
-                nota,
-                idtipo,
-                idmodelo,
-                protocolo,
-                marked,
-                id_solicitacao_prova,
-                idprova_impressa
-            }
-
-            document.body.classList.add("loading")
-
-            fetch(url, {
-                method: 'POST',
-                body: JSON.stringify(body)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if ('follow_up' in data) {
-                    handleApiError({"err": {"1": "Existem mais de 1 prova para esse aluno hoje. Por favor, contacte o IBREP para mais informações."}})
-                    return;
-                    handleIbrepApiFollowUp(data);
-                } else if (!dataHasErr(data)) {
-                    handleIbrepApiAnswer(data);
-                } else {
-                    handleApiError(data);
-                }
-            })
-            // .catch(err => Swal.fire({
-            //     text: err,
-            //     icon: 'error'
-            // }))
-            .finally(() => {
-                document.body.classList.remove("loading")
-            })
-        }
+        enableFileLoad([overlayElement]);
     </script>
 </body>
 </html>

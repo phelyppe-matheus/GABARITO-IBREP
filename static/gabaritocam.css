@@ -1,0 +1,123 @@
+:root {
+    --cam-bt-size: 50px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: black;
+    margin: 0;
+}
+
+/* HTML: <div class="loader"></div> */
+body.loading .loader {
+    width: 30%;
+    aspect-ratio: 4;
+    position: absolute;
+    inset: 50%;
+    transform: translate(-50%, -50%);
+
+    background: radial-gradient(circle closest-side, black 90%,#0000) 0/calc(100%/3) 100% no-repeat;
+    animation: l2 1s steps(3) infinite;
+}
+@keyframes l2 {to{background-position: 150%}}
+
+.container {
+    position: relative;
+
+    height: 100vh;
+    max-height: 100vh;
+    min-height: 100vh;
+    width: 100vw;
+    max-width: 100vw;
+    min-width: 100vw;
+
+    overflow: hidden;
+}
+
+video {
+    position: absolute;
+    height: 100%;
+    inset: 50%;
+    transform: translate(-50%, -50%);
+}
+
+img.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    inset: 50%;
+    transform: translate(-50%, -50%);
+}
+
+button.buttonCenter {
+    height: calc(1.64*var(--cam-bt-size));
+    transform: 
+        translateX(50vw)
+        translateX(-50%);
+}
+
+button.buttonLeft {
+    height: var(--cam-bt-size);
+    transform:
+        translateX(50vw)
+        translateX(-50%)
+        translateX(calc(-1.5*var(--cam-bt-size)));
+}
+
+button.buttonRight {
+    height: var(--cam-bt-size);
+    transform: 
+        translateX(50vw)
+        translateX(-50%)
+        translateX(calc(1.5*var(--cam-bt-size)));    
+}
+
+button.buttonCam {
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    border: 1px solid white;
+    bottom: 10px;
+    left: 0;
+}
+
+button.buttonPrimary {
+    background: var(--primary-bt-background, #ff000095);
+}
+
+button.buttonSecondary {
+    background: var(--secondary-bt-background, #0000ff95);
+}
+
+button.buttonAux {
+    background: var(--aux-bt-background, #ffffff95);
+}
+
+.options {
+    position: absolute;
+    background: #00000050;
+    border: 1px solid black;
+    border-radius: 5px;
+    inset: 10px 10px auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.options button {
+    border: none;
+    background: none;
+    color: white;
+}
+
+canvas {
+    position: fixed;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    scale: 0.01;
+}

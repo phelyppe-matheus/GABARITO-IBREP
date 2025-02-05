@@ -33,8 +33,12 @@
             }
             apiHandler = new ApiHandler({imgBuffer:gabaritoCam.imgBuffer})
             await apiHandler.send()
-            apiHandler.sendSuccessMessage("Leitura bem sucedida, enviando para a escola");
-
+            if (!"data" in school) {
+                await apiHandler.sendSuccessMessage("Leitura falhou");
+                return;
+            } else {
+                await apiHandler.sendSuccessMessage("Leitura bem sucedida, enviando para a escola");
+            }
 
             school = new SchoolApiHandler({testData: apiHandler.testData, schoolUrl: "{{conf['school_url']}}/api/set/score"})
             await school.send();

@@ -34,7 +34,7 @@
             apiHandler = new ApiHandler({imgBuffer:gabaritoCam.imgBuffer})
             try {
                 await apiHandler.send()
-                if (!("data" in apiHandler)) {
+                if (!("testData" in apiHandler)) {
                     await apiHandler.handleApiError({err:{reading_error: "Leitura falhou"}});
                     return;
                 } else {

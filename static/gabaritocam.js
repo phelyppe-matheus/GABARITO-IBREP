@@ -64,6 +64,7 @@ class GabaritoCam {
     }
 
     retry() {
+        this.imgBuffer = ""
         this.webCamElement.play();
     }
 

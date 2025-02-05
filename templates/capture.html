@@ -72,6 +72,11 @@
         <img src="{{url_for('static', filename='overlay/examLayoutOverlay.svg')}}" alt="{{conf['strings']['overlay_alt']}}" id="overlayElement" class="overlay">
         <div class="options">
             <button id="flip" onclick="gabaritoCam.torch()" class="cam-opt"><i class="fa fa-flash"></i></button>
+            <select name="controlsPos" id="controlsPos">
+                <option value="Center">{{conf["strings"]["control_pos_center"]}}</option>
+                <option value="Left">{{conf["strings"]["control_pos_left"]}}</option>
+                <option value="Right">{{conf["strings"]["control_pos_right"]}}</option>
+            </select>
             <button id="expand" onclick="gabaritoCam.askForFullScreen()" class="screen-opt" download><i class="fa fa-expand"></i></button>
         </div>
         <button id="retry" onclick="gabaritoCam.retry();" class="buttonCam buttonAux buttonLeft" download><i class="fa fa-eraser"></i></button>

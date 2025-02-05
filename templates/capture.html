@@ -53,6 +53,7 @@
             let clearBuffer = setInterval(() => {
                 gabaritoCam.imgBuffer = ""
                 clearInterval(clearBuffer)
+                gabaritoCam.retry()
             }, 1000)
         }
     </script>

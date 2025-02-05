@@ -32,12 +32,16 @@
                 return;
             }
             apiHandler = new ApiHandler({imgBuffer:gabaritoCam.imgBuffer})
-            await apiHandler.send()
-            if (!"data" in apiHandler) {
-                await apiHandler.handleApiError({reading_error: "Leitura falhou"});
-                return;
-            } else {
-                await apiHandler.sendSuccessMessage("Leitura bem sucedida, enviando para a escola");
+            try {
+                await apiHandler.send()
+                if (!("data" in apiHandler)) {
+                    await apiHandler.handleApiError({reading_error: "Leitura falhou"});
+                    return;
+                } else {
+                    await apiHandler.sendSuccessMessage("Leitura bem sucedida, enviando para a escola");
+                }
+            } catch(e) {
+
             }
 
             school = new SchoolApiHandler({testData: apiHandler.testData, schoolUrl: "{{conf['school_url']}}/api/set/score"})

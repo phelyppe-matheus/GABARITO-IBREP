@@ -51,6 +51,15 @@ img.overlay {
     transform: translate(-50%, -50%);
 }
 
+button.buttonCam {
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    border: 1px solid white;
+    bottom: 10px;
+    left: 0;
+}
+
 button.buttonCenter {
     height: calc(1.64*var(--cam-bt-size));
     transform: 
@@ -63,7 +72,7 @@ button.buttonLeft {
     transform:
         translateX(50vw)
         translateX(-50%)
-        translateX(calc(-1.5*var(--cam-bt-size)));
+        translateX(calc(-2*var(--cam-bt-size)));
 }
 
 button.buttonRight {
@@ -71,16 +80,31 @@ button.buttonRight {
     transform: 
         translateX(50vw)
         translateX(-50%)
-        translateX(calc(1.5*var(--cam-bt-size)));    
+        translateX(calc(2*var(--cam-bt-size)));    
 }
 
-button.buttonCam {
-    position: absolute;
-    aspect-ratio: 1;
-    border-radius: 100%;
-    border: 1px solid white;
-    bottom: 10px;
-    left: 0;
+.container:has(select option[value="Left"]:checked) button.buttonCam {
+    left: 10px;
+}
+
+.container:has(select option[value="Right"]:checked) button.buttonCam {
+    left: auto;
+    right: 10px;
+}
+
+.container:has(select option[value="Right"]:checked) button.buttonCenter,
+.container:has(select option[value="Left"]:checked) button.buttonCenter {
+    transform: none;
+}
+
+.container:has(select option[value="Right"]:checked) button.buttonLeft,
+.container:has(select option[value="Left"]:checked) button.buttonLeft {
+    transform: translateY(calc(-3.5*var(--cam-bt-size)));
+}
+
+.container:has(select option[value="Right"]:checked) button.buttonRight,
+.container:has(select option[value="Left"]:checked) button.buttonRight {
+    transform: translateY(calc(-2*var(--cam-bt-size)));    
 }
 
 button.buttonPrimary {

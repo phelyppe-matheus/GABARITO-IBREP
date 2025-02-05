@@ -33,8 +33,8 @@
             }
             apiHandler = new ApiHandler({imgBuffer:gabaritoCam.imgBuffer})
             await apiHandler.send()
-            if (!"data" in school) {
-                await apiHandler.sendSuccessMessage("Leitura falhou");
+            if (!"data" in apiHandler) {
+                await apiHandler.handleApiError({reading_error: "Leitura falhou"});
                 return;
             } else {
                 await apiHandler.sendSuccessMessage("Leitura bem sucedida, enviando para a escola");

@@ -41,7 +41,7 @@
                     await apiHandler.sendSuccessMessage("Leitura bem sucedida, enviando para a escola");
                 }
             } catch(e) {
-
+                await apiHandler.handleApiError({reading_error: "Não consegui iniciar a leitura"});
             }
 
             school = new SchoolApiHandler({testData: apiHandler.testData, schoolUrl: "{{conf['school_url']}}/api/set/score"})

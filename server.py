@@ -43,8 +43,9 @@ def exam_review():
 
 @app.route("/exam/capture", methods=["GET"])
 def exam_capture():
+    lang = request.accept_languages.best_match(supported_languages)
     conf = {}
-    conf["strings"] = capture_strings
+    conf["strings"] = capture_strings[lang]
     conf['strings']["system_title"] = system_title
     conf["school_url"] = system_url
     conf["colors"] = {

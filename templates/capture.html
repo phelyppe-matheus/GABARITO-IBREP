@@ -35,13 +35,13 @@
             try {
                 await apiHandler.send()
                 if (!("data" in apiHandler)) {
-                    await apiHandler.handleApiError({reading_error: "Leitura falhou"});
+                    await apiHandler.handleApiError({err:{reading_error: "Leitura falhou"}});
                     return;
                 } else {
                     await apiHandler.sendSuccessMessage("Leitura bem sucedida, enviando para a escola");
                 }
             } catch(e) {
-                await apiHandler.handleApiError({reading_error: "Não consegui iniciar a leitura"});
+                await apiHandler.handleApiError({err:{reading_error: "Não consegui iniciar a leitura"}});
             }
 
             school = new SchoolApiHandler({testData: apiHandler.testData, schoolUrl: "{{conf['school_url']}}/api/set/score"})

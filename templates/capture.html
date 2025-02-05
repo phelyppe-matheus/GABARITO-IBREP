@@ -51,9 +51,8 @@
                 await gabaritoCam.showImg(school.imgBuffer)
             }
             let clearBuffer = setInterval(() => {
-                gabaritoCam.imgBuffer = ""
-                clearInterval(clearBuffer)
                 gabaritoCam.retry()
+                clearInterval(clearBuffer)
             }, 1000)
         }
     </script>

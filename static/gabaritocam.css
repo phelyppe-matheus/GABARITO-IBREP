@@ -24,6 +24,12 @@ body.loading .loader {
 }
 @keyframes l2 {to{background-position: 150%}}
 
+body.loading img.overlay {
+    box-shadow: 0 0 0 1rem var(--secondary-bt-background, #ff000095) inset;
+    animation: l3 1s steps(30) infinite;
+}
+@keyframes l3 {to{overlay: 100%}}
+
 .container {
     position: relative;
 

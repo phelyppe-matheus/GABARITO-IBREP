@@ -200,6 +200,11 @@ class AnswerSheetRecognitionModel:
             choices = []
             for j in range(self.choiceCount):
                 choices.append(self.getChoice(i, j).flatten())
+                if (hasattr(self, "datasetinfo")):  
+                    ch = self.getChoice(i, j)
+                    ch = ch * (ch < ch.mean())
+                    ch = (ch.sum() / (ch > 1).sum()).astype(int)
+                    self.datasetinfo[i,j] = ch
 
             self.answersProb[i] = np.array(model.predict(choices))
 
@@ -213,7 +218,6 @@ class AnswerSheetRecognitionModel:
                 self.studentsAnswers[i] = -2
                 if 'noanswer' not in self.err: self.err['noanswer'] = []
                 self.err['noanswer'].append(i)
-        cv2.waitKey()
 
     def reviewAnswers(self, correctAnswers):
         correct = 0

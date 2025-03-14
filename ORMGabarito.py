@@ -206,7 +206,7 @@ class AnswerSheetRecognitionModel:
             if (self.answersProb[i] == 1).sum() > 1:
                 if 'duplicate' not in self.warning: self.warning['duplicate'] = []
                 self.warning['duplicate'].append(i)
-                self.studentsAnswers[i] = self.answersProb[i].argmax()
+                self.studentsAnswers[i] = -2
             elif self.answersProb[i].max() == 1:
                 self.studentsAnswers[i] = self.answersProb[i].argmax()
             else:

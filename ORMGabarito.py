@@ -44,6 +44,7 @@ class AnswerSheetRecognitionModel:
 
     def recognise(self):
         self.studentsAnswers = np.int8(np.zeros((self.questionCount))-2)
+        self.warning = {}
         self.err = {}
 
         _, __, ___, imgCanny = self.preProcessing(self.img)
@@ -203,8 +204,8 @@ class AnswerSheetRecognitionModel:
             self.answersProb[i] = np.array(model.predict(choices))
 
             if (self.answersProb[i] == 1).sum() > 1:
-                if 'duplicate' not in self.err: self.err['duplicate'] = []
-                self.err['duplicate'].append(i)
+                if 'duplicate' not in self.warning: self.warning['duplicate'] = []
+                self.warning['duplicate'].append(i)
                 self.studentsAnswers[i] = self.answersProb[i].argmax()
             elif self.answersProb[i].max() == 1:
                 self.studentsAnswers[i] = self.answersProb[i].argmax()

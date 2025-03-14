@@ -21,4 +21,5 @@ def reviewController(exam, response):
     utils.update(response, review.response)
     utils.update(response, utils.qrdata_to_resdata(json.loads(qrcodeData)))
     utils.update(response['err'], review.reviewer.err)
+    utils.update(response['warning'], review.reviewer.warning)
 

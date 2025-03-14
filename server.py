@@ -28,7 +28,7 @@ def goto_capture():
 
 @app.route("/api/exam/review", methods=["POST"])
 def exam_review():
-    res = {"err": {}}
+    res = {"err": {}, "warning": {}}
     exam = request.json
     try:
         reviewController(exam=exam, response=res)

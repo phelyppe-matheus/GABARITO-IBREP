@@ -36,10 +36,11 @@ for filename in os.listdir(data_dir):
                 ORMParameters.hitThreshold = 0.465
             model = AnswerSheetRecognitionModel()
             model.setUp(questionCount=20, choiceCount=5, path=filepath)
+            model.datasetinfo = np.zeros((20,5))
             model.recognise()
             scores = np.concatenate((scores, (model.answersProb * 100).astype(int).flatten()))
 
-            unique, counts = np.unique((model.answersProb * 100).astype(int).flatten(), return_counts=True)
+            unique, counts = np.unique((model.datasetinfo).astype(int).flatten(), return_counts=True)
             plt.bar(x=unique, height=counts)
             plt.waitforbuttonpress()
 

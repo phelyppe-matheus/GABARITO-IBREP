@@ -85,10 +85,13 @@ class AnswerSheetRecognitionModel:
             width = self.choiceWidth
 
             if xcorrect == xstudent:
-                imgStRight = cv2.circle(imgStRight, (xcorrect+width//2, y+height//2), 30, (255), -1)
-            if xcorrect != xstudent:
-                imgStWrong = cv2.circle(imgStWrong, (xstudent+width//2, y+height//2), 30, (255), -1)
-                imgCorrect = cv2.circle(imgCorrect, (xcorrect+width//2, y+height//2), 30, (255), -1)
+                cv2.circle(imgStRight, (xcorrect+width//2, y+height//2), 30, (255), -1)
+            elif xstudent < 0:
+                cv2.rectangle(imgShaped, (0, y), (width*self.questionCount,  y+height), (255), -1)
+                cv2.rectangle(imgStWrong, (0, y), (width*self.questionCount,  y+height), (255), -1)
+            elif xcorrect != xstudent:
+                cv2.circle(imgStWrong, (xstudent+width//2, y+height//2), 30, (255), -1)
+                cv2.circle(imgCorrect, (xcorrect+width//2, y+height//2), 30, (255), -1)
 
         imgPoints = cv2.merge((imgShaped, imgStRight, imgStWrong))
         imgPoints[:,:,2] += imgCorrect
@@ -96,10 +99,11 @@ class AnswerSheetRecognitionModel:
         perspective = cv2.getPerspectiveTransform(self.warpAnswerPoints, self.shapeAnswerPoints)
         imgPointsOriginalPerspective = cv2.warpPerspective(imgPoints, perspective, (img.shape[1], img.shape[0]))
         imgMarked = cv2.add(img, imgPointsOriginalPerspective, (None))
-        imgMarked = cv2.rectangle(imgMarked, (30,30), (220, 125), (30,30,30), -1)
-        imgMarked = cv2.putText(imgMarked, strings["pt"]["correct_answer"], (50,60), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,0), 2)
-        imgMarked = cv2.putText(imgMarked, strings["pt"]["wrong_answer"], (50,85), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,0,255), 2)
-        imgMarked = cv2.putText(imgMarked, strings["pt"]["actual_answer"], (50,110), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,255), 2)
+        cv2.rectangle(imgMarked, (30,30), (220, 150), (30,30,30), -1)
+        cv2.putText(imgMarked, strings["pt"]["correct_answer"], (50,60), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,0), 2)
+        cv2.putText(imgMarked, strings["pt"]["wrong_answer"], (50,85), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,0,255), 2)
+        cv2.putText(imgMarked, strings["pt"]["actual_answer"], (50,110), cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,255), 2)
+        cv2.putText(imgMarked, strings["pt"]["null_answer"], (50,135), cv2.FONT_HERSHEY_SIMPLEX, .7, (255,0,255), 2)
 
         return imgMarked
 

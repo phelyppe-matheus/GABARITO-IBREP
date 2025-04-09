@@ -85,15 +85,20 @@ class ApiHandler {
         }
     }
 
-    askForNumber(title, inputLabel) {
+    askForNumber(
+        title,
+        inputLabel,
+        inputPlaceholder = "ex.: 654321",
+        inputAttributes = {"maxlength" : "15"}
+    ) {
         try {
             return Swal.fire({
                 title,
                 input: "tel",
                 inputLabel,
-                inputPlaceholder: "ex.: 654321",
+                inputPlaceholder: inputPlaceholder,
                 inputAttributes: {
-                    maxlength: "10",
+                    maxlength: inputAttributes["maxlength"],
                     autocapitalize: "off",
                     autocorrect: "off"
                 }

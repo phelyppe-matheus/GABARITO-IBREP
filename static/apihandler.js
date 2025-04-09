@@ -63,7 +63,7 @@ class ApiHandler {
         title,
         input,
         {
-            inputLabel = "Digite o Idmatricula do aluno em específico",
+            inputLabel = "Digite o CPF do aluno em específico",
             inputPlaceholder = "ex.: 654321",
             inputAttributes = {
                 maxlength: "10",
@@ -97,13 +97,14 @@ class ApiHandler {
                     autocapitalize: "off",
                     autocorrect: "off"
                 }
-                // preConfirm: () => {
-                //     return document.getElementById("idmatricula").value;
-                // }
             })
                 .then(data => data.value)
         } catch(e) {
-            return window.prompt("Digite o Idmatricula do aluno em específico");
+            if (inputLabel) {
+                return window.prompt(`${title}: ${inputLabel}`);
+            } else {
+                return window.prompt(`${title}`);
+            }
         }
     }
 
@@ -142,17 +143,17 @@ class SchoolApiHandler extends ApiHandler {
     }
 
     async send() {
-        let idmatricula
+        let cpf
         let protocolo
         const url = this.url
 
         while (true) {
-            idmatricula = await this.askForNumber("Digite a matricula", "Digite o Idmatricula do aluno em específico")
+            cpf = await this.askForNumber("Digite a matricula", "Digite o CPF do aluno em específico")
             protocolo = await this.askForNumber("Digite o protocolo", "Digite o protocolo de arquivo da prova")
 
-            idmatricula = Number(idmatricula)
+            cpf = Number(cpf)
 
-            if (idmatricula && protocolo) {
+            if (cpf && protocolo) {
                 break
             }
             Swal.fire({
@@ -169,7 +170,7 @@ class SchoolApiHandler extends ApiHandler {
         const idprova_impressa = this.testData["idprova_impressa"]
 
         const body = {
-            idmatricula,
+            cpf,
             iddisciplina,
             nota,
             idtipo,

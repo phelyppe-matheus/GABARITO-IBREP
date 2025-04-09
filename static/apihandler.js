@@ -153,7 +153,7 @@ class SchoolApiHandler extends ApiHandler {
         const url = this.url
 
         while (true) {
-            cpf = await this.askForNumber("Digite a matricula", "Digite o CPF do aluno em específico")
+            cpf = await this.askForNumber("Digite o CPF do aluno", "Digite o CPF do aluno em específico")
             protocolo = await this.askForNumber("Digite o protocolo", "Digite o protocolo de arquivo da prova")
 
             cpf = Number(cpf)
@@ -162,7 +162,7 @@ class SchoolApiHandler extends ApiHandler {
                 break
             }
             Swal.fire({
-                text: "Necessito da matricula do aluno em questão.",
+                text: "Necessito do CPF do aluno em questão.",
                 icon: "error"
             })
         }

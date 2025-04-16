@@ -3,6 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
@@ -151,4 +152,9 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%);
     scale: 0.01;
+}
+
+label[for="protocolo"] {
+    color: white;
+    font-weight: bold;
 }

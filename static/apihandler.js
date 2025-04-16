@@ -150,14 +150,11 @@ class SchoolApiHandler extends ApiHandler {
 
     async send() {
         let cpf;
-        let matricula;
-        const url = this.url;
 
         while (true) {
             cpf = await this.askForNumber("Digite o CPF do aluno", "Digite o CPF do aluno em específico")
-            matricula = await this.askForNumber("Digite a matrícula do aluno", "Digite a matrícula do aluno em específico")
 
-            if (cpf && this.protocolo && matricula) {
+            if (cpf && this.protocolo) {
                 break
             }
             Swal.fire({
@@ -181,7 +178,6 @@ class SchoolApiHandler extends ApiHandler {
             idtipo,
             idmodelo,
             protocolo,
-            matricula,
             marked,
             id_solicitacao_prova:this.id_solicitacao_prova,
             idprova_impressa
@@ -189,24 +185,72 @@ class SchoolApiHandler extends ApiHandler {
 
         document.body.classList.add("loading")
 
+        await this.handleFetch(body);
+    }
+
+    async handleFetch(body) {
+        const url = this.url;
+
         await fetch(url, {
             method: 'POST',
             body: JSON.stringify(body)
         })
-        .then(res => res.json())
-        .then(async data => {
-            if ('follow_up' in data) {
-                this.handleApiError({"err": {"1": "Existem mais de 1 prova para esse aluno hoje. Por favor, contacte o IBREP para mais informações."}})
-                return;
-                this.handleIbrepApiFollowUp(data);
-            } else if (!this.dataHasErr(data)) {
-                this.data = data
-            } else {
-                this.handleApiError(data);
-            }
-        })
-        .finally(() => {
-            document.body.classList.remove("loading")
-        })
+            .then(res => res.json())
+            .then(async data => {
+                if ('follow_up' in data) {
+                    this.handleIbrepApiFollowUp(data, body);
+                } else if (!this.dataHasErr(data)) {
+                    this.data = data
+                } else {
+                    this.handleApiError(data);
+                }
+            })
+            .finally(() => {
+                document.body.classList.remove("loading")
+            })
     }
+
+    async handleIbrepApiFollowUp(data, fetchBody) {
+        const provas = data.follow_up;
+    
+        // Gera uma lista de opções para o usuário escolher
+        const inputOptions = provas.reduce((options, prova, index) => {
+            const label = `
+                ${prova.aluno} - ${prova.polo || "Polo não informado"}<br/>
+                Prova: ${prova.data_realizacao} das ${prova.de} às ${prova.ate}
+            `;
+            options[index] = label;
+            return options;
+        }, {});
+    
+        const { value: selectedIndex } = await Swal.fire({
+            title: 'Selecione a prova correta',
+            html: 'Encontramos múltiplas provas para este aluno hoje.<br>Escolha a prova correspondente:',
+            input: 'radio',
+            inputOptions: inputOptions,
+            inputValidator: (value) => {
+                if (value === null) {
+                    return 'Você precisa selecionar uma das provas.';
+                }
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar',
+            confirmButtonText: 'Confirmar',
+            allowOutsideClick: false
+        });
+    
+        if (selectedIndex !== undefined) {
+            const selectedProva = provas[selectedIndex];
+    
+            // Chama o fluxo novamente com a idmatricula escolhida
+            fetchBody["id_solicitacao_prova"] = selectedProva.id_solicitacao_prova;
+            this.handleFetch(fetchBody);
+        } else {
+            Swal.fire({
+                title: 'Operação cancelada',
+                icon: 'info',
+                text: 'Nenhuma prova foi selecionada.'
+            });
+        }
+    }    
 }

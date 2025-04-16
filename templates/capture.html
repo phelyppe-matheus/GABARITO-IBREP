@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{conf['strings']['system_title']}}</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.svg') }}">
-    <link rel="stylesheet" href="{{url_for('static', filename='gabaritocam.css')}}?version=2">
+    <link rel="stylesheet" href="{{url_for('static', filename='gabaritocam.css')}}?version=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{url_for('static', filename='gabaritocam.js')}}?version=3"></script>
-    <script src="{{url_for('static', filename='apihandler.js')}}?version=3"></script>
+    <script src="{{url_for('static', filename='apihandler.js')}}?version=4"></script>
     <script>
         let gabaritoCam;
         let protocolo;
@@ -19,6 +19,7 @@
             canvasToSend = document.getElementById("canvasToSend")
             gabaritoCam = new GabaritoCam({webCamElement,canvasToSend})
             protocolo = await new ApiHandler({}).askForNumber("Digite o protocolo", "Digite o protocolo de arquivo da prova");
+            document.getElementById("protocolo").value = protocolo;
         }
 
         async function snap() {
@@ -74,6 +75,10 @@
         <img src="{{url_for('static', filename='overlay/examLayoutOverlay.svg')}}" alt="{{conf['strings']['overlay_alt']}}" id="overlayElement" class="overlay">
         <div class="options">
             <button id="flip" onclick="gabaritoCam.torch()" class="cam-opt"><i class="fa fa-flash"></i></button>
+            <div>
+                <label for="protocolo">Protocolo:</label>
+                <input id="protocolo" onchange="protocolo=this.value" type="text">
+            </div>
             <select name="controlsPos" id="controlsPos">
                 <option value="Center">{{conf["strings"]["control_pos_center"]}}</option>
                 <option value="Left">{{conf["strings"]["control_pos_left"]}}</option>

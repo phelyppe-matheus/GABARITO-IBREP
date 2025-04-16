@@ -134,10 +134,11 @@ class ApiHandler {
 
 
 class SchoolApiHandler extends ApiHandler {
-    constructor({testData, schoolUrl}) {
+    constructor({testData, schoolUrl, protocolo}) {
         super({imgBuffer:testData["marked"]})
         this.testData = testData
         this.url = schoolUrl
+        this.protocolo = protocolo
     }
 
     handleIbrepApiAnswer(answer) {
@@ -148,17 +149,15 @@ class SchoolApiHandler extends ApiHandler {
     }
 
     async send() {
-        let cpf
-        let protocolo
-        const url = this.url
+        let cpf;
+        let matricula;
+        const url = this.url;
 
         while (true) {
             cpf = await this.askForNumber("Digite o CPF do aluno", "Digite o CPF do aluno em específico")
-            protocolo = await this.askForNumber("Digite o protocolo", "Digite o protocolo de arquivo da prova")
+            matricula = await this.askForNumber("Digite a matrícula do aluno", "Digite a matrícula do aluno em específico")
 
-            cpf = Number(cpf)
-
-            if (cpf && protocolo) {
+            if (cpf && this.protocolo && matricula) {
                 break
             }
             Swal.fire({
@@ -173,6 +172,7 @@ class SchoolApiHandler extends ApiHandler {
         const idmodelo = Number(this.testData["idmodelo"])
         const marked = this.testData["marked"]
         const idprova_impressa = this.testData["idprova_impressa"]
+        const protocolo = this.protocolo;
 
         const body = {
             cpf,
@@ -181,6 +181,7 @@ class SchoolApiHandler extends ApiHandler {
             idtipo,
             idmodelo,
             protocolo,
+            matricula,
             marked,
             id_solicitacao_prova:this.id_solicitacao_prova,
             idprova_impressa

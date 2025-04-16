@@ -12,11 +12,13 @@
     <script src="{{url_for('static', filename='apihandler.js')}}?version=3"></script>
     <script>
         let gabaritoCam;
+        let protocolo;
 
-        window.onload = () => {
+        window.onload = async () => {
             webCamElement = document.getElementById("webCam")
             canvasToSend = document.getElementById("canvasToSend")
             gabaritoCam = new GabaritoCam({webCamElement,canvasToSend})
+            protocolo = await new ApiHandler({}).askForNumber("Digite o protocolo", "Digite o protocolo de arquivo da prova");
         }
 
         async function snap() {
@@ -44,7 +46,7 @@
                 await apiHandler.handleApiError({err:{reading_error: "Não consegui iniciar a leitura"}});
             }
 
-            school = new SchoolApiHandler({testData: apiHandler.testData, schoolUrl: "{{conf['school_url']}}/api/set/score"})
+            school = new SchoolApiHandler({testData: apiHandler.testData, schoolUrl: "{{conf['school_url']}}/api/set/score", protocolo})
             await school.send();
             if ("data" in school) {
                 await school.handleIbrepApiAnswer(school.data)

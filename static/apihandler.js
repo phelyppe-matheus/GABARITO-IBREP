@@ -198,7 +198,7 @@ class SchoolApiHandler extends ApiHandler {
             .then(res => res.json())
             .then(async data => {
                 if ('follow_up' in data) {
-                    this.handleIbrepApiFollowUp(data, body);
+                    await this.handleIbrepApiFollowUp(data, body);
                 } else if (!this.dataHasErr(data)) {
                     this.data = data
                 } else {

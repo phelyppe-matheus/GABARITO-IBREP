@@ -183,13 +183,12 @@ class SchoolApiHandler extends ApiHandler {
             idprova_impressa
         }
 
-        document.body.classList.add("loading")
-
         await this.handleFetch(body);
     }
 
     async handleFetch(body) {
         const url = this.url;
+        document.body.classList.add("loading")
 
         await fetch(url, {
             method: 'POST',
@@ -198,6 +197,7 @@ class SchoolApiHandler extends ApiHandler {
             .then(res => res.json())
             .then(async data => {
                 if ('follow_up' in data) {
+                    document.body.classList.remove("loading")
                     await this.handleIbrepApiFollowUp(data, body);
                 } else if (!this.dataHasErr(data)) {
                     this.data = data
@@ -244,7 +244,7 @@ class SchoolApiHandler extends ApiHandler {
     
             // Chama o fluxo novamente com a idmatricula escolhida
             fetchBody["id_solicitacao_prova"] = selectedProva.id_solicitacao_prova;
-            this.handleFetch(fetchBody);
+            await this.handleFetch(fetchBody);
         } else {
             Swal.fire({
                 title: 'Operação cancelada',
